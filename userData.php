@@ -1,0 +1,115 @@
+<?php
+    session_start();
+    include 'modules/user/class.user.php';
+
+    $uid = $_SESSION['uid'];
+    $editId = $_GET['uid'];
+
+    if(!isset($uid)){
+        header('Location: index.php');
+        exit();
+    }else{
+        $user = new User($uid);
+        $role = $user->getUserRoleNumber();
+        $name = $user->getUsersName();
+    }
+
+    if($role > 1){
+        $_SESSION['access'] = 2;
+        header('Location: main.php');
+        exit();
+    }
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/login.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
+            integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Edit Page</title>
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
+        <?php
+            echo '<a class="navbar-brand" href="#">Hello, '.$name.'!</a>'; 
+        ?> 
+        <ul class="navbar-nav text-uppercase">
+            <li class="nav-item">
+                <a class="nav-link" href="main.php">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="addPage.php">Add User</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Edit User</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="deletePage.php">Delete</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="container mt-3 border shadow">
+        <h2 class="text-center text-secondary mt-2">Edit User</h2>
+        <?php
+            $edit = new User($editId);
+            
+            foreach($edit->getData() as $data){
+                echo '<form action="modules/user/editUser.php" method="POST" id="editUserForm">';
+                echo '   <h5 id="editName" class="text-primary text-center"></h5>';
+                echo '    <input type="text" id="uid" name="uid" value="'.$editId.'" hidden>';
+                echo '    <div class="input-group mb-3">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Name</span>';
+                echo '        </div>';
+                echo '        <input type="text" id="editFirstName" class="form-control" value="'.$data['first_name'].'" name="editFirstName"  placeholder="First Name"  autocomplete="off">';
+                echo '        <input type="text" id="editLastName" class="form-control" value="'.$data['last_name'].'"  name="editLastName" placeholder="Last Name" autocomplete="off">';
+                echo '    </div>';
+                echo '    <div class="input-group mb-3">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Username</span>';
+                echo '        </div>';
+                echo '        <input type="text" id="editUserName" value="'.$data['username'].'"  class="form-control" name="editUserName" autocomplete="off">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Password</span>';
+                echo '        </div>';
+                echo '        <input type="password" id="editPassword" class="form-control" name="newPassword" placeholder="Input only if you want to change password!" autocomplete="off">';
+                echo '    </div>';
+                echo '    <div class="row">';
+                if($data['role'] == 1){
+                    echo '        <div id="selectEdit" class="col-sm-6">';
+                    echo '            <select class="browser-default custom-select" name="editRole">';
+                    echo '                <option value="0">--User Roles--</option>';
+                    echo '                <option value="1" selected>Admin</option>';
+                    echo '                <option value="2">Guest</option>';
+                    echo '            </select>'; 
+                    echo '        </div>';
+                }else{
+                    echo '        <div id="selectEdit" class="col-sm-6">';
+                    echo '            <select class="browser-default custom-select" name="editRole">';
+                    echo '                <option value="0">--User Roles--</option>';
+                    echo '                <option value="1">Admin</option>';
+                    echo '                <option value="2" selected>Guest</option>';
+                    echo '            </select>'; 
+                    echo '        </div>';                    
+                }
+                echo '        <div class="col-sm-6">';
+                echo '            <input type="submit" class="btn btn-block btn-dark" id="editSubmit" name="editSubmit" value="Edit">';
+                echo '        </div>';        
+                echo '    </div>';
+                echo '</form>';
+            }
+        ?>
+        <div id="undo" class="mt-2 mb-2"><a href="editPage.php" class="undo btn btn block btn-danger" name="undo">Back</a></div>
+    </div>    
+</body>
+</html>
