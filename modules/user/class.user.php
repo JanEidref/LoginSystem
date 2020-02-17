@@ -183,7 +183,7 @@
             mysqli_query($this->connection, $profile);
             mysqli_query($this->connection, $rbac);
 
-            $_SESSION['success'] = "Successfully Deleted User!";
+            $_SESSION['success'] = "Successfully Deleted User ".$name."!";
             header("Location: ../../deletePage.php");
        }
 
