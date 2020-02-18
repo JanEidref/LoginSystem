@@ -2,17 +2,14 @@
     class Login{
 
         //Properties of class Login
-        private $host     = "localhost";
-        private $dbuser   = "root";
-        private $dbpass   = "admin";
-        private $database = "login";
         private $connection;
           
         
         //Connect to Database and Logs user in
         function __construct(){
 
-            $this->connection = mysqli_connect($this->host, $this->dbuser, $this->dbpass, $this->database);
+            // $this->connection = mysqli_connect("localhost", "root", "admin", "login");
+            $this->connection = mysqli_connect("localhost", "root", "admin", "login");
 
             if(!$this->connection){
                 die("Error: " .mysqli_error($this->connection));
