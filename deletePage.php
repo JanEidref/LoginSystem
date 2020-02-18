@@ -59,18 +59,14 @@
     
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">Delete User</h2>
-        <?php
-            if(isset($_SESSION['success'])){
-                echo '<div class="row">';
-                echo '  <div id="alert" class="col-sm-12 mt-2">';
-                echo '      <div class="alert alert-success">';
-                echo '          <strong>Success:</strong> '.$_SESSION['success'];
-                echo '      </div>';
-                echo '  </div>';                    
-                echo '</div>';
-                unset($_SESSION['success']);                
-            }
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="" id="status">
 
+                </div>  
+            </div>
+        </div>        
+        <?php
             echo '<table id="dataTable" class="table table-hover mt-2">';
             echo '  <thead class="thead-dark">';
             echo '      <tr>';
@@ -96,7 +92,7 @@
                     echo '      <td class="text-center">'.$data['username'].'</td>';
                     echo '      <td class="text-center">'.$id->getUsersName().'</td>';
                     echo '      <td class="text-center">'.$id->getUserRole().'</>';
-                    echo '      <td class="text-center"><a href="modules/user/deleteUser.php?uid='.$data['uid'].'" class="btn btn-danger">Delete</a></>';
+                    echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['uid'].'" name="delete">Delete</button></>';
                     echo '  </tr>';
 
                     $number++;
@@ -111,4 +107,27 @@
     </div> 
     </div>    
 </body>
+<script>
+    $(document).ready(function(){
+
+        $(document).on("click", ".delete", function(){
+
+            if (confirm("Are you sure?")) {
+                $.ajax({
+                    type     : "POST",
+                    url      : 'modules/user/deleteUser.php',
+                    data     : {id:$(this).val()},
+                    success  : function(response){
+                        $('#status').html(response);
+                        $('#status').attr("class", "alert alert-success");
+                        $("#dataTable")   .load(location.href+" #dataTable>*","");
+                    }
+                });
+            }
+            return false;            
+
+        });
+
+    });
+</script>
 </html>

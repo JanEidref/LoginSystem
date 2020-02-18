@@ -185,8 +185,7 @@
             mysqli_query($this->connection, $profile);
             mysqli_query($this->connection, $rbac);
 
-            $_SESSION['success'] = "Successfully Deleted User ".$name."!";
-            header("Location: ../../deletePage.php");
+            echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";
        }
 
        function editUser($uid, $firstName, $lastName, $userName, $password, $role){

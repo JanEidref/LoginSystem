@@ -15,7 +15,7 @@
         header('Location: ../../main.php');
         exit();
     }else{
-        $id = $_GET['uid'];
+        $id = $_POST['id'];
     
         $user = new User($id);        
         $user->deleteUser();        
