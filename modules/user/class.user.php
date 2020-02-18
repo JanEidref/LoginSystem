@@ -97,13 +97,15 @@
        //get data of certain user
        function getData(){
 
-            $query     = "SELECT * FROM complete_data where uid='$this->uid'";
-            $result    = mysqli_query($this->connection, $query);
+            $query     = $this->connection->prepare("SELECT * FROM complete_data where uid=?");
+            $query     ->bind_param("i", $this->uid);
+            $query     ->execute();
+            $row       = $query->get_result();
             $resultSet = array();
 
-            if(mysqli_num_rows($result) > 0){
+            if($row->num_rows > 0){
 
-                while($data = mysqli_fetch_assoc($result)){
+                while($data = $row->fetch_array(MYSQLI_ASSOC)){
 
                     array_push($resultSet, $data);
 
@@ -188,9 +190,19 @@
             echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";
        }
 
+       //Edit user's data
        function editUser($uid, $firstName, $lastName, $userName, $password, $role){
 
             session_start();
+
+            $query  = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
+            $query  ->bind_param("si", $userName, $uid);
+            $query  ->execute();
+            $row    = $query->get_result();
+
+            if($row->num_rows > 0){
+                throw new Exception("Username Already Taken!");
+            }
 
             if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
                 throw new Exception("No Blank Fields Please!");
