@@ -1,18 +1,17 @@
 <?php
     session_start();
     include 'modules/user/class.user.php';
+    include 'modules/rbac/class.rbac.php';
 
     $uid    = $_SESSION['uid'];
     $access = $_SESSION['access'];
 
-    if(!isset($uid)){
-        header('Location: index.php');
-        exit();
-    }else{
-        $user = new User($uid);
-        $role = $user->getUserRoleNumber();
-        $name = $user->getUsersName();
-    }
+    $user = new User($uid);
+    $rbac = new Rbac($uid);
+    $rbac ->checkSession();
+    $role = $rbac->getUserRoleNumber();
+    $name = $user->getUsersName();
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

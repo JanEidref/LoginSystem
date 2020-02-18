@@ -40,22 +40,6 @@
             }
 
         }
-
-        //Get number of Users Role
-        function getUserRoleNumber(){
-
-            $query  = "SELECT role FROM rbac WHERE uid='$this->uid'";
-            $result = mysqli_query($this->connection, $query);
-            
-            if(mysqli_num_rows($result) > 0){
-
-                $data = mysqli_fetch_assoc($result);
-
-                return $data['role'];
-
-            }
-
-        }
         
         //Get name of certain User
         function getUsersName(){

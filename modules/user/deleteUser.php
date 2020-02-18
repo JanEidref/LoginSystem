@@ -2,24 +2,15 @@
 
     session_start();
     include 'class.user.php';
+    include '../rbac/class.rbac.php';
 
-    $uid   = $_SESSION['uid'];
-    $check = new User($uid);
-    $role  = $check->getUserRoleNumber(); 
+    $uid  = $_SESSION['uid'];
+    $rbac = new rbac($uid);
+    $rbac ->checkSession();
+    $rbac ->checkAccess();
     
-    if(!isset($uid)){
-        header('Location: ../../index.php');
-        exit();
-    }else if($role > 1){
-        $_SESSION['access'] = 2;
-        header('Location: ../../main.php');
-        exit();
-    }else{
-        $id = $_POST['id'];
-    
-        $user = new User($id);        
-        $user->deleteUser();        
-    }
-
+    $id   = $_POST['id'];
+    $user = new User($id);        
+    $user ->deleteUser();        
 
 ?>

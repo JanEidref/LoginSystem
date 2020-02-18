@@ -1,23 +1,16 @@
 <?php
     session_start();
     include 'modules/user/class.user.php';
+    include 'modules/rbac/class.rbac.php';
 
     $uid = $_SESSION['uid'];
 
-    if(!isset($uid)){
-        header('Location: index.php');
-        exit();
-    }else{
-        $user = new User($uid);
-        $role = $user->getUserRoleNumber();
-        $name = $user->getUsersName();
-    }
+    $user = new User($uid);
+    $rbac = new Rbac($uid);
+    $rbac ->checkSession();
+    $rbac ->checkAccess();
+    $name = $user->getUsersName();
 
-    if($role > 1){
-        $_SESSION['access'] = 2;
-        header('Location: main.php');
-        exit();
-    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
