@@ -3,14 +3,23 @@
     include 'modules/user/class.user.php';
     include 'modules/rbac/class.rbac.php';
 
-    $uid = $_SESSION['uid'];
+    $uid    = $_SESSION['uid'];
     $editId = $_GET['uid'];
 
-    $user = new User($uid);
-    $rbac = new Rbac($uid);
-    $rbac ->checkSession();
-    $rbac ->checkAccess();
-    $name = $user->getUsersName();
+    $user   = new User($uid);
+    $rbac   = new Rbac($uid);
+    $role   = $rbac->getUserRoleNumber();
+    
+    if(!$uid){
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();          
+    }else if($role > 1){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/main.php');
+        exit();               
+    }else{
+        $name = $user->getUsersName();
+    }
 
 ?>
 <!DOCTYPE html>
@@ -53,12 +62,19 @@
     
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">Edit User</h2>
+        <div class="row">
+            <div class="col-sm-12 mt-2">
+                <div class="" id="alert">
+
+                </div>
+            </div>                    
+        </div>
         <?php
             
             $edit = new User($editId);
             
             foreach($edit->getData() as $data){
-                echo '<form action="modules/user/editUser.php" method="POST" id="editUserForm">';
+                echo '<form method="POST" id="editUserForm">';
                 echo '   <h5 id="editName" class="text-primary text-center"></h5>';
                 echo '    <input type="text" id="uid" name="uid" value="'.$editId.'" hidden>';
                 echo '    <div class="input-group mb-3">';
@@ -106,4 +122,27 @@
         <div id="undo" class="mt-2 mb-2"><a href="editPage.php" class="undo btn btn block btn-danger" name="undo">Back</a></div>
     </div>    
 </body>
+<script>
+
+    $(document).ready(function(){
+
+        //edit user function
+        $('#editUserForm').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                type    : "POST",
+                url     : 'modules/user/editUser.php',
+                data    : $(this).serialize(),
+                success : function(response){
+                    var jsonData = JSON.parse(response);
+                    $('#alert').html(jsonData.Result);
+                    $('#alert').attr("class", jsonData.Status);
+                    $("#editUserForm").load(location.href+" #editUserForm>*","");
+                }
+            });
+        });
+
+    });
+    
+</script>
 </html>

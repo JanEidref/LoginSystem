@@ -2,41 +2,17 @@
     class User{
 
         //Properties of Class User
-        private $host     = "localhost";
-        private $dbuser   = "root";
-        private $dbpass   = "admin";
-        private $database = "login";
         private $connection, $uid;
           
         
         //Connect to Database and set id
         function __construct($uid){
 
-            $this->connection = mysqli_connect($this->host, $this->dbuser, $this->dbpass, $this->database);
+            $this->connection = mysqli_connect("localhost", "root", "admin", "login");
             $this->uid        = $uid;
 
             if(!$this->connection){
                 die("Error: " .mysqli_error($this->connection));
-            }
-
-        }
-
-
-        //Get role of User
-        function getUserRole(){
-
-            $query  = "SELECT role FROM rbac WHERE uid='$this->uid'";
-            $result = mysqli_query($this->connection, $query);
-            
-            if(mysqli_num_rows($result) > 0){
-
-                $data = mysqli_fetch_assoc($result);
-                if($data['role'] > 1){
-                    return "Guest";
-                }else{
-                    return "Admin";
-                }
-
             }
 
         }
@@ -45,101 +21,97 @@
         function getUsersName(){
 
             $query  = "SELECT first_name, last_name FROM user_profile WHERE uid='$this->uid'";
-            $result = mysqli_query($this->connection, $query);
-            
-            if(mysqli_num_rows($result) > 0){
-                
-                $data = mysqli_fetch_assoc($result);
-
-                return $data['first_name']." ".$data['last_name'];
-
-            }
+            $result = mysqli_query($this->connection, $query);     
+            $data   = mysqli_fetch_assoc($result);
+            return $data['first_name']." ".$data['last_name'];
 
         }
 
-        //Get all users
-        function getAllFromUser(){
+        //Get all users data
+        function getAllData(){
 
-            $query     = "SELECT * FROM users";
-            $result    = mysqli_query($this->connection, $query);
-            $resultSet = array();
-            
-            if(mysqli_num_rows($result) > 0){
-
-                while($data = mysqli_fetch_assoc($result)){
-
-                    array_push($resultSet, $data);    
-
-                }
-
-                return $resultSet;
-
-            }
+            $query  = "SELECT * FROM complete_data";
+            $result = mysqli_query($this->connection, $query);
+            return $result;
 
        }
 
        //get data of certain user
        function getData(){
 
-            $query     = $this->connection->prepare("SELECT * FROM complete_data where uid=?");
-            $query     ->bind_param("i", $this->uid);
-            $query     ->execute();
-            $row       = $query->get_result();
-            $resultSet = array();
+            $query = $this->connection->prepare("SELECT * FROM complete_data where uid=?");
+            $query ->bind_param("i", $this->uid);
+            $query ->execute();
+            return $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+       }
+
+       //validate if fields are empty
+       function checkFields($userName, $password, $firstName, $lastName, $role){
+
+            if(!$userName == TRUE || !$password == TRUE || !$firstName == TRUE || !$lastName == TRUE){
+                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+            }else if($role == 0){
+                throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
+            }    
+
+       }
+
+       //validate if edit fields are empty
+       function checkEditFields($userName, $firstName, $lastName, $role){
+
+            if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
+                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+            }else if($role == 0){
+                throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
+            }    
+
+       }
+
+       //check if username is already taken
+       function checkUserName($userName){
+
+            $query = $this->connection->prepare("SELECT username FROM users WHERE username=?");
+            $query -> bind_param("s", $userName);
+            $query ->execute();                        
+            $row   = $query->get_result();
 
             if($row->num_rows > 0){
-
-                while($data = $row->fetch_array(MYSQLI_ASSOC)){
-
-                    array_push($resultSet, $data);
-
-                }
-
-                return $resultSet;
-
+                throw new Exception("<strong>Error:</strong> Username Already Taken!");
             }
 
        }
 
-       //Validate form input and add user if input is valid
-       function addUser($userName, $password, $firstName, $lastName, $role){
+       //check if edit username is taken
+       function checkEditUserName($userName, $uid){
 
-            session_start();
-
-            if(!$userName == TRUE || !$password == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-                throw new Exception("No Blank Fields Please!");
-            }else if($role == 0){
-                throw new Exception("Please Select A Role For The User!");
-            }
-
-            $query             = $this->connection->prepare("SELECT username FROM users WHERE username=?");
-            $query             -> bind_param("s", $userName);
-            $query             ->execute();                        
-            $row               = $query->get_result();
+            $query = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
+            $query -> bind_param("si", $userName,$uid);
+            $query ->execute();                        
+            $row   = $query->get_result();
 
             if($row->num_rows > 0){
-                throw new Exception("Username Already Taken!");
+                throw new Exception("<strong>Error:</strong> Username Already Taken!");
             }
 
-            $selectUsers       = "SELECT uid FROM users";
-            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
-            $uid               = 0;
+        }
 
-            if(mysqli_num_rows($selectUsersResult) > 0){
+       //get max uid
+       function getMaxUid(){
 
-                while($data = mysqli_fetch_assoc($selectUsersResult)){
+        $selectUsers       = "SELECT max(uid) as max FROM users";
+        $selectUsersResult = mysqli_query($this->connection, $selectUsers);
+        $data              = mysqli_fetch_assoc($selectUsersResult);
+        return $data['max'] + 1;
 
-                    if($data['uid'] > $uid){
+       }
 
-                        $uid = $data['uid'];
+       //add data of user
+       function addUser($userName, $password, $firstName, $lastName, $role){
 
-                    }   
-
-                }
-
-                $uid = $uid + 1;
-
-            }
+            $this->checkFields($userName, $password, $firstName, $lastName, $role);
+            $this->checkUserName($userName);
+            $uid = $this->getMaxUid();
 
             $encrypt = password_hash($password, PASSWORD_DEFAULT);
         
@@ -155,8 +127,9 @@
             $rbac->bind_param("ii",$uid,$role);
             $rbac->execute();
 
-            $_SESSION['success'] = "Successfully Added User!";
-            header("Location: ../../addPage.php");
+            $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
+            echo json_encode($response);
+
        }
 
        //Delete user by id
@@ -177,31 +150,10 @@
        //Edit user's data
        function editUser($uid, $firstName, $lastName, $userName, $password, $role){
 
-            session_start();
-
-            $query  = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
-            $query  ->bind_param("si", $userName, $uid);
-            $query  ->execute();
-            $row    = $query->get_result();
-
-            if($row->num_rows > 0){
-                throw new Exception("Username Already Taken!");
-            }
-
-            if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-                throw new Exception("No Blank Fields Please!");
-            }else if($role == 0){
-                throw new Exception("Please Select A Role For The User!");
-            }
-            
-            $query  = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
-            $query  ->bind_param("si", $userName, $uid);
-            $query  ->execute();
-            $row    = $query->get_result();
-
-            if($row->num_rows > 0){
-                throw new Exception("Username Already Taken!");
-            }
+            $this->uid = $uid;
+            $name      = $this->getUsersName();
+            $this->checkEditUserName($userName, $uid);
+            $this->checkEditFields($userName, $firstName, $lastName, $role);
             
             if(!$password == TRUE){
 
@@ -217,8 +169,8 @@
                 $editRbac->bind_param("ii", $role, $uid);
                 $editRbac->execute();
      
-                $_SESSION['success'] = "Successfully Edited User!";
-                header("Location: ../../editPage.php");
+                $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
+                echo json_encode($response);
 
             }else{
 
@@ -236,8 +188,8 @@
                 $editRbac->bind_param("ii", $role, $uid);
                 $editRbac->execute();
      
-                $_SESSION['success'] = "Successfully Edited User!";
-                header("Location: ../../editPage.php");
+                $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
+                echo json_encode($response);
 
             }
 

@@ -7,9 +7,18 @@
 
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $rbac ->checkSession();
-    $rbac ->checkAccess();
-    $name = $user->getUsersName();
+    $role = $rbac->getUserRoleNumber();
+    
+    if(!$uid){
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();          
+    }else if($role > 1){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/main.php');
+        exit();               
+    }else{
+        $name = $user->getUsersName();
+    }
 
 ?>
 <!DOCTYPE html>
@@ -52,28 +61,14 @@
     
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">Add User</h2>
-        <?php
-            if(isset($_SESSION['error'])){
-                echo '<div class="row">';
-                echo '  <div id="alert" class="col-sm-12 mt-2">';
-                echo '      <div class="alert alert-danger">';
-                echo '          <strong>Error:</strong> '.$_SESSION['error'];
-                echo '      </div>';
-                echo '  </div>';                    
-                echo '</div>';
-                unset($_SESSION['error']);
-            }else if(isset($_SESSION['success'])){
-                echo '<div class="row">';
-                echo '  <div id="alert" class="col-sm-12 mt-2">';
-                echo '      <div class="alert alert-success">';
-                echo '          <strong>Success:</strong> '.$_SESSION['success'];
-                echo '      </div>';
-                echo '  </div>';                    
-                echo '</div>';
-                unset($_SESSION['success']);                
-            }
-        ?>
-        <form class="mb-4" method="POST" action="modules/user/addUSer.php" id="addUserForm">
+        <div class="row">
+            <div class="col-sm-12 mt-2">
+                <div class="" id="alert">
+
+                </div>
+            </div>                    
+        </div>
+        <form class="mb-4" method="POST" id="addUserForm">
             <div class="input-group mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text">Username</span>
@@ -106,4 +101,27 @@
         </form>
     </div>    
 </body>
+<script>
+
+    $(document).ready(function(){
+
+        //add user function
+        $('#addUserForm').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                type    : "POST",
+                url     : 'modules/user/addUser.php',
+                data    : $(this).serialize(),
+                success : function(response){
+                    var jsonData = JSON.parse(response);
+                    $('#alert').html(jsonData.Result);
+                    $('#alert').attr("class", jsonData.Status);
+                    $("#addUserForm").load(location.href+" #addUserForm>*","");
+                }
+            });
+        });
+
+    });
+
+</script>
 </html>

@@ -17,6 +17,21 @@
 
         }
 
+        function verifyPassword($password, $hash, $uid){
+
+            if(password_verify($password, $hash)){
+                session_start();
+                $_SESSION['uid']     = $uid;
+                $_SESSION['access']  = 1;
+                header('Location: ../../main.php');
+            }else{
+                session_start();
+                $_SESSION['Error'] = "Wrong Password!";
+                header('Location: ../../index.php');
+            }
+
+        }
+
         function checkLogin($userName, $password){
 
             $query   = $this->connection->prepare("SELECT * FROM users WHERE username=?");
@@ -27,16 +42,7 @@
 
             if($row->num_rows > 0){
 
-                if(password_verify($password, $data['password'])){
-                    session_start();
-                    $_SESSION['uid']     = $data['uid'];
-                    $_SESSION['access']  = 1;
-                    header('Location: ../../main.php');
-                }else{
-                    session_start();
-                    $_SESSION['Error'] = "Wrong Password!";
-                    header('Location: ../../index.php');
-                }
+                $this->verifyPassword($password, $data['password'], $data['uid']);
 
             }else{
                 session_start();

@@ -8,10 +8,14 @@
 
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $rbac ->checkSession();
-    $role = $rbac->getUserRoleNumber();
-    $name = $user->getUsersName();
 
+    if(!$uid){
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();  
+    }else{
+        $role = $rbac->getUserRoleNumber();
+        $name = $user->getUsersName();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -100,19 +104,20 @@
             echo '  </thead>';
             echo '  <tbody>';
 
-            $number = 1;
+            $number  = 1;
+            $allUser = $user->getAllData();
 
-            foreach($user->getAllFromUser() as $data){
+            foreach($allUser as $data){
 
                 if($uid <> $data['uid']){
 
-                    $id = new User($data['uid']);
+                    $fullName   = $data['first_name']." ".$data['last_name'];
 
                     echo '  <tr>';
                     echo '      <td class="text-center">'.$number.'</td>';
                     echo '      <td class="text-center">'.$data['username'].'</td>';
-                    echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                    echo '      <td class="text-center">'.$id->getUserRole().'</>';
+                    echo '      <td class="text-center">'.$fullName.'</td>';
+                    echo '      <td class="text-center">'.$data['role_name'].'</>';
                     echo '  </tr>';
 
                     $number++;

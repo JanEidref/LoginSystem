@@ -7,9 +7,18 @@
 
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $rbac ->checkSession();
-    $rbac ->checkAccess();
-    $name = $user->getUsersName();
+    $role = $rbac->getUserRoleNumber();
+    
+    if(!$uid){
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();          
+    }else if($role > 1){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/main.php');
+        exit();               
+    }else{
+        $name = $user->getUsersName();
+    }
 
 ?>
 <!DOCTYPE html>
@@ -72,19 +81,20 @@
             echo '  </thead>';
             echo '  <tbody>';
 
-            $number = 1;
+            $number  = 1;
+            $allUser = $user->getAllData();
 
-            foreach($user->getAllFromUser() as $data){
+            foreach($allUser as $data){
 
                 if($uid <> $data['uid']){
 
-                    $id = new User($data['uid']);
+                    $fullName   = $data['first_name']." ".$data['last_name'];
 
                     echo '  <tr>';
                     echo '      <td class="text-center">'.$number.'</td>';
                     echo '      <td class="text-center">'.$data['username'].'</td>';
-                    echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                    echo '      <td class="text-center">'.$id->getUserRole().'</>';
+                    echo '      <td class="text-center">'.$fullName.'</td>';
+                    echo '      <td class="text-center">'.$data['role_name'].'</>';
                     echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['uid'].'" name="delete">Delete</button></>';
                     echo '  </tr>';
 
@@ -105,7 +115,7 @@
 
         $(document).on("click", ".delete", function(){
 
-            if (confirm("Are you sure?")) {
+            if (confirm("Are you sure you want to delete user?")) {
                 $.ajax({
                     type     : "POST",
                     url      : 'modules/user/deleteUser.php',
@@ -113,7 +123,7 @@
                     success  : function(response){
                         $('#status').html(response);
                         $('#status').attr("class", "alert alert-success");
-                        $("#dataTable")   .load(location.href+" #dataTable>*","");
+                        $("#dataTable").load(location.href+" #dataTable>*","");
                     }
                 });
             }

@@ -7,9 +7,18 @@
 
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $rbac ->checkSession();
-    $rbac ->checkAccess();
-    $name = $user->getUsersName();
+    $role = $rbac->getUserRoleNumber();
+    
+    if(!$uid){
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();          
+    }else if($role > 1){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/main.php');
+        exit();               
+    }else{
+        $name = $user->getUsersName();
+    }
 
 ?>
 <!DOCTYPE html>
@@ -54,27 +63,7 @@
         <h2 class="text-center text-secondary mt-2">Edit User</h2>
         <?php
 
-            if(isset($_SESSION['error'])){
-                echo '<div class="row">';
-                echo '  <div id="alert" class="col-sm-12 mt-2">';
-                echo '      <div class="alert alert-danger">';
-                echo '          <strong>Error:</strong> '.$_SESSION['error'];
-                echo '      </div>';
-                echo '  </div>';                    
-                echo '</div>';
-                unset($_SESSION['error']);
-            }else if(isset($_SESSION['success'])){
-                echo '<div class="row">';
-                echo '  <div id="alert" class="col-sm-12 mt-2">';
-                echo '      <div class="alert alert-success">';
-                echo '          <strong>Success:</strong> '.$_SESSION['success'];
-                echo '      </div>';
-                echo '  </div>';                    
-                echo '</div>';
-                unset($_SESSION['success']);                
-            }
-
-            echo '<table id="dataTable" class="table table-hover mt-2">';
+            echo '<table id="dataTable" class="table table-hover">';
             echo '  <thead class="thead-dark">';
             echo '      <tr>';
             echo '          <th class="text-center"></th>';
@@ -86,19 +75,20 @@
             echo '  </thead>';
             echo '  <tbody>';
 
-            $number = 1;
+            $number  = 1;
+            $allUser = $user->getAllData();
 
-            foreach($user->getAllFromUser() as $data){
+            foreach($allUser as $data){
 
                 if($uid <> $data['uid']){
 
-                    $id = new User($data['uid']);
+                    $fullName   = $data['first_name']." ".$data['last_name'];
 
                     echo '  <tr>';
                     echo '      <td class="text-center">'.$number.'</td>';
                     echo '      <td class="text-center">'.$data['username'].'</td>';
-                    echo '      <td class="text-center">'.$id->getUsersName().'</td>';
-                    echo '      <td class="text-center">'.$id->getUserRole().'</>';
+                    echo '      <td class="text-center">'.$fullName.'</td>';
+                    echo '      <td class="text-center">'.$data['role_name'].'</>';
                     echo '      <td class="text-center"><a href="userData.php?uid='.$data['uid'].'" class="btn btn-primary">Edit</a></>';
                     echo '  </tr>';
 
