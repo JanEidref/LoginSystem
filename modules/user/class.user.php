@@ -8,6 +8,7 @@
         //Connect to Database and set id
         function __construct($uid){
 
+            // $this->connection = mysqli_connect("localhost", "root", "admin", "login");
             $this->connection = mysqli_connect("localhost", "root", "admin", "login");
             $this->uid        = $uid;
 
