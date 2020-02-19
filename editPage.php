@@ -28,6 +28,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -36,26 +37,38 @@
 <body>
     <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
         <?php
-            echo '<a class="navbar-brand" href="#">Hello, '.$name.'!</a>'; 
+            echo '<a class="navbar-brand" href="profilePage.php">Hello, '.$name.'!</a>'; 
         ?> 
         <ul class="navbar-nav text-uppercase">
             <li class="nav-item">
                 <a class="nav-link" href="main.php">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="addPage.php">Add User</a>
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    User Menu
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="addPage.php">Add User</a>
+                    <a class="dropdown-item active" href="#">Edit User</a>
+                    <a class="dropdown-item" href="deletePage.php">Delete User</a>
+                </div>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Edit User</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="deletePage.php">Delete</a>
-            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    Rbac Menu
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">View Role</a>
+                    <a class="dropdown-item" href="#">Add Role</a>
+                    <a class="dropdown-item" href="#">Edit Role</a>
+                    <a class="dropdown-item" href="#">Delete Role</a>
+                </div>
+             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-                <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
-            </li>
+        <li class="nav-item active">
+        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
+        </li>
         </ul>
     </nav>
     

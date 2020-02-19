@@ -29,6 +29,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -37,26 +38,38 @@
 <body>
     <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
         <?php
-            echo '<a class="navbar-brand" href="#">Hello, '.$name.'!</a>'; 
+            echo '<a class="navbar-brand" href="profilePage.php">Hello, '.$name.'!</a>'; 
         ?> 
         <ul class="navbar-nav text-uppercase">
             <li class="nav-item">
                 <a class="nav-link" href="main.php">Home</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="addPage.php">Add User</a>
+            <li class="nav-item dropdown active">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    User Menu
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="addPage.php">Add User</a>
+                    <a class="dropdown-item active" href="#">Edit User</a>
+                    <a class="dropdown-item" href="deletePage.php">Delete User</a>
+                </div>
             </li>
-            <li class="nav-item active">
-                <a class="nav-link" href="#">Edit User</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="deletePage.php">Delete</a>
-            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
+                    Rbac Menu
+                </a>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">View Role</a>
+                    <a class="dropdown-item" href="#">Add Role</a>
+                    <a class="dropdown-item" href="#">Edit Role</a>
+                    <a class="dropdown-item" href="#">Delete Role</a>
+                </div>
+             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item active">
-                <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
-            </li>
+        <li class="nav-item active">
+        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
+        </li>
         </ul>
     </nav>
     
@@ -95,22 +108,41 @@
                 echo '        <input type="password" id="editPassword" class="form-control" name="newPassword" placeholder="Input only if you want to change password!" autocomplete="off">';
                 echo '    </div>';
                 echo '    <div class="row">';
-                if($data['role'] == 1){
-                    echo '        <div id="selectEdit" class="col-sm-6">';
-                    echo '            <select class="browser-default custom-select" name="editRole">';
-                    echo '                <option value="0">--User Roles--</option>';
-                    echo '                <option value="1" selected>Admin</option>';
-                    echo '                <option value="2">Guest</option>';
-                    echo '            </select>'; 
-                    echo '        </div>';
-                }else{
-                    echo '        <div id="selectEdit" class="col-sm-6">';
-                    echo '            <select class="browser-default custom-select" name="editRole">';
-                    echo '                <option value="0">--User Roles--</option>';
-                    echo '                <option value="1">Admin</option>';
-                    echo '                <option value="2" selected>Guest</option>';
-                    echo '            </select>'; 
-                    echo '        </div>';                    
+
+                switch($data['role']){
+
+                    case 1:
+                        echo '        <div id="selectEdit" class="col-sm-6">';
+                        echo '            <select class="browser-default custom-select" name="editRole">';
+                        echo '                <option value="0">--User Roles--</option>';
+                        echo '                <option value="1" selected>Admin</option>';
+                        echo '                <option value="2">Employee</option>';
+                        echo '                <option value="3">Guest</option>';
+                        echo '            </select>'; 
+                        echo '        </div>';
+                        break;
+
+                    case 2:
+                        echo '        <div id="selectEdit" class="col-sm-6">';
+                        echo '            <select class="browser-default custom-select" name="editRole">';
+                        echo '                <option value="0">--User Roles--</option>';
+                        echo '                <option value="1">Admin</option>';
+                        echo '                <option value="2" selected>Employee</option>';
+                        echo '                <option value="3">Guest</option>';
+                        echo '            </select>'; 
+                        echo '        </div>';
+                        break;
+
+                    case 3:
+                        echo '        <div id="selectEdit" class="col-sm-6">';
+                        echo '            <select class="browser-default custom-select" name="editRole">';
+                        echo '                <option value="0">--User Roles--</option>';
+                        echo '                <option value="1">Admin</option>';
+                        echo '                <option value="2">Employee</option>';
+                        echo '                <option value="3" selected>Guest</option>';
+                        echo '            </select>'; 
+                        echo '        </div>';
+                        break;
                 }
                 echo '        <div class="col-sm-6">';
                 echo '            <input type="submit" class="btn btn-block btn-dark" id="editSubmit" name="editSubmit" value="Edit">';

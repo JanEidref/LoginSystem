@@ -12,7 +12,7 @@
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($role > 1){
+    }else if($role > 2){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
         exit();               

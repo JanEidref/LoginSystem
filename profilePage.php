@@ -4,18 +4,20 @@
     include 'modules/rbac/class.rbac.php';
 
     $uid    = $_SESSION['uid'];
-    $access = $_SESSION['access'];
 
-    $user = new User($uid);
-    $rbac = new Rbac($uid);
-
+    $user   = new User($uid);
+    $rbac   = new Rbac($uid);
+    $role   = $rbac->getUserRoleNumber();
+    
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
-        exit();  
+        exit();          
     }else{
-        $role = $rbac->getUserRoleNumber();
         $name = $user->getUsersName();
     }
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,19 +30,19 @@
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Main Page</title>
+    <title>Edit Page</title>
 </head>
 <body>
     <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
         <?php
-            echo '<a class="navbar-brand" href="profilePage.php">Hello, '.$name.'!</a>';
+            echo '<a class="navbar-brand" href="#">Hello, '.$name.'!</a>'; 
             
             switch($role){
 
                 case 1:
                     echo '<ul class="navbar-nav text-uppercase">';
                     echo '  <li class="nav-item active">';
-                    echo '      <a class="nav-link" href="#">Home</a>';
+                    echo '      <a class="nav-link" href="main.php">Home</a>';
                     echo '   </li>';
                     echo '  <li class="nav-item dropdown">';
                     echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
@@ -70,11 +72,11 @@
                     echo '    </li>';
                     echo '</ul>';
                     break;
-
+                    
                 case 2:
                     echo '<ul class="navbar-nav text-uppercase">';
                     echo '  <li class="nav-item active">';
-                    echo '      <a class="nav-link" href="#">Home</a>';
+                    echo '      <a class="nav-link" href="main.php">Home</a>';
                     echo '   </li>';
                     echo '  <li class="nav-item dropdown">';
                     echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
@@ -108,7 +110,7 @@
                 case 3:
                     echo '<ul class="navbar-nav text-uppercase">';
                     echo '  <li class="nav-item active">';
-                    echo '      <a class="nav-link" href="#">Home</a>';
+                    echo '      <a class="nav-link" href="main.php">Home</a>';
                     echo '   </li>';
                     echo '  <li class="nav-item dropdown">';
                     echo '      <a class="nav-link dropdown-toggle disabled" href="#" id="navbardrop" data-toggle="dropdown">';
@@ -141,59 +143,74 @@
 
             }
         ?> 
-
     </nav>
     
     <div class="container mt-3 border shadow">
-        <h2 class="text-center text-secondary mt-2">All Users</h2>
+        <h2 class="text-center text-secondary mt-2">Edit Profile</h2>
+        <div class="row">
+            <div class="col-sm-12 mt-2">
+                <div class="" id="alert">
+
+                </div>
+            </div>                    
+        </div>
         <?php
-
-            if($access > 1){
-                echo '<div class="row">';
-                echo '    <div class="col-sm-12">';
-                echo '        <div class="alert alert-danger" id="addStatus">';
-                echo '              <strong>Error:</strong> Access Denied!';
-                echo '        </div>';  
+            
+            $edit = new User($uid);
+            
+            foreach($edit->getData() as $data){
+                echo '<form method="POST" id="editProfile">';
+                echo '   <h5 id="editName" class="text-primary text-center"></h5>';
+                echo '    <input type="text" id="uid" name="uid" value="'.$uid.'" hidden>';
+                echo '    <div class="input-group mb-3">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Name</span>';
+                echo '        </div>';
+                echo '        <input type="text" id="editFirstName" class="form-control" value="'.$data['first_name'].'" name="editFirstName"  placeholder="First Name"  autocomplete="off">';
+                echo '        <input type="text" id="editLastName" class="form-control" value="'.$data['last_name'].'"  name="editLastName" placeholder="Last Name" autocomplete="off">';
                 echo '    </div>';
-                echo '</div>';
+                echo '    <div class="input-group mb-3">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Username</span>';
+                echo '        </div>';
+                echo '        <input type="text" id="editUserName" value="'.$data['username'].'"  class="form-control" name="editUserName" autocomplete="off">';
+                echo '        <div class="input-group-prepend">';
+                echo '            <span class="input-group-text">Password</span>';
+                echo '        </div>';
+                echo '        <input type="password" id="editPassword" class="form-control" name="newPassword" placeholder="Input only if you want to change password!" autocomplete="off">';
+                echo '    </div>';
+                echo '    <div class="row">';       
+                echo '        <div class="col-sm-12">';
+                echo '            <input type="submit" class="btn btn-block btn-dark" id="editSubmit" name="editSubmit" value="Save">';
+                echo '        </div>';         
+                echo '    </div>';
+                echo '</form>';
             }
-
-            echo '<table id="dataTable" class="table table-hover mt-2">';
-            echo '  <thead class="thead-dark">';
-            echo '      <tr>';
-            echo '          <th class="text-center"></th>';
-            echo '          <th class="text-center">Username</th>';
-            echo '          <th class="text-center">Full Name</th>';
-            echo '          <th class="text-center">Role</th>';
-            echo '      </tr>';
-            echo '  </thead>';
-            echo '  <tbody>';
-
-            $number  = 1;
-            $allUser = $user->getAllData();
-
-            foreach($allUser as $data){
-
-                if($uid <> $data['uid']){
-
-                    $fullName   = $data['first_name']." ".$data['last_name'];
-
-                    echo '  <tr>';
-                    echo '      <td class="text-center">'.$number.'</td>';
-                    echo '      <td class="text-center">'.$data['username'].'</td>';
-                    echo '      <td class="text-center">'.$fullName.'</td>';
-                    echo '      <td class="text-center">'.$data['role_name'].'</>';
-                    echo '  </tr>';
-
-                    $number++;
-
-                }
-
-            }
-
-            echo '  </tbody>';
-            echo '</table>';
         ?>
+        <div id="undo" class="mt-2 mb-2"><a href="main.php" class="undo btn btn block btn-danger" name="undo">Back</a></div>
     </div>    
 </body>
+<script>
+
+    $(document).ready(function(){
+
+        //edit user function
+        $('#editProfile').submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                type    : "POST",
+                url     : 'modules/user/editProfile.php',
+                data    : $(this).serialize(),
+                success : function(response){
+                    var jsonData = JSON.parse(response);
+                    $('#alert').html(jsonData.Result);
+                    $('#alert').attr("class", jsonData.Status);
+                    $("#editProfile").load(location.href+" #editProfile>*","");
+                }
+            });
+        });
+
+    });
+    
+</script>
 </html>

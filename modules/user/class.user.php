@@ -69,6 +69,15 @@
 
        }
 
+       //validate if edit fields are empty
+       function checkProfileFields($userName, $firstName, $lastName){
+
+            if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
+                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+            }
+
+        }
+
        //check if username is already taken
        function checkUserName($userName){
 
@@ -195,6 +204,46 @@
             }
 
        }
+
+       //Edit own profile
+       function editUserProfile($uid, $firstName, $lastName, $userName, $password){
+
+        $this->uid = $uid;
+        $name      = $this->getUsersName();
+        $this->checkEditUserName($userName, $uid);
+        $this->checkProfileFields($userName, $firstName, $lastName);
+        
+        if(!$password == TRUE){
+
+            $editUser    = $this->connection->prepare('UPDATE users SET username=? WHERE uid=?');
+            $editUser->bind_param("si", $userName, $uid);
+            $editUser->execute();
+
+            $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
+            $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
+            $editProfile->execute();
+ 
+            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Your Profile!", 'Status' => "alert alert-success");
+            echo json_encode($response);
+
+        }else{
+
+            $encrypt     = password_hash($password, PASSWORD_DEFAULT);
+
+            $editUser    = $this->connection->prepare('UPDATE users SET username=?, password=? WHERE uid=?');
+            $editUser->bind_param("ssi", $userName, $encrypt, $uid);
+            $editUser->execute();
+
+            $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
+            $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
+            $editProfile->execute();
+ 
+            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Your Profile!", 'Status' => "alert alert-success");
+            echo json_encode($response);
+
+        }
+
+   }
 
     }
 
