@@ -12,7 +12,7 @@
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($role > 2){
+    }else if($role > 1){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
         exit();               
@@ -46,23 +46,23 @@
                     echo '  <li class="nav-item">';
                     echo '      <a class="nav-link" href="main.php">Home</a>';
                     echo '   </li>';
-                    echo '  <li class="nav-item dropdown active">';
+                    echo '  <li class="nav-item dropdown">';
                     echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
                     echo '          User Menu';
                     echo '      </a>';
                     echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item active" href="#">Add User</a>';
+                    echo '      <a class="dropdown-item" href="addPage.php">Add User</a>';
                     echo '      <a class="dropdown-item" href="editPage.php">Edit User</a>';
                     echo '      <a class="dropdown-item" href="deletePage.php">Delete User</a>';
                     echo '  </div>';
                     echo '  </li>';
-                    echo '  <li class="nav-item dropdown">';
+                    echo '  <li class="nav-item dropdown active">';
                     echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
                     echo '          Rbac Menu';
                     echo '      </a>';
                     echo '  <div class="dropdown-menu">';
                     echo '      <a class="dropdown-item" href="roles.php">View Role</a>';
-                    echo '      <a class="dropdown-item" href="addRolePage.php">Add Role</a>';
+                    echo '      <a class="dropdown-item active" href="#" active>Add Role</a>';
                     echo '      <a class="dropdown-item" href="#">Edit Role</a>';
                     echo '      <a class="dropdown-item" href="#">Delete Role</a>';
                     echo '  </div>';
@@ -148,7 +148,7 @@
     </nav>
     
     <div class="container mt-3 border shadow">
-        <h2 class="text-center text-secondary mt-2">Add User</h2>
+        <h2 class="text-center text-secondary mt-2">Add Role</h2>
         <div class="row">
             <div class="col-sm-12 mt-2">
                 <div class="" id="alert">
@@ -156,60 +156,23 @@
                 </div>
             </div>                    
         </div>
-        <form class="mb-4" method="POST" id="addUserForm">
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Username</span>
+        <form class="mb-4" method="POST" id="addRoleForm">
+            <div class="row">
+                <div class="input-group mb-3 col-sm-6">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Role Name</span>
+                    </div>
+                    <input type="text" id="roleName" class="form-control" name="roleName" autocomplete="off">
                 </div>
-                <input type="text" id="userName" class="form-control" name="userName" autocomplete="off">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Password</span>
+                <div class="input-group mb-3 col-sm-6">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Role Level</span>
+                    </div>
+                    <input type="number" min=1 id="roleLevel" class="form-control" name="roleLevel" autocomplete="off">
                 </div>
-                <input type="password" id="password" class="form-control" name="password" autocomplete="off">
-            </div>
-            <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">Name</span>
-                </div>
-                <input type="text" id="firstName" class="form-control" name="firstName"  placeholder="First Name"  autocomplete="off">
-                <input type="text" id="lastName" class="form-control" name="lastName" placeholder="Last Name" autocomplete="off">
             </div>
             <div class="row">
-                <div id="selectAdd" class="col-sm-6">
-                    <select class="browser-default custom-select" name="role">
-                        <option value="0" selected>--User Roles--</option>
-                        <?php
-                            $options = $rbac->getAllRoles();
-                            if($role > 1){
-
-                                foreach($options as $data){
-
-                                    if($data['role_level'] == 1){
-
-                                        echo '<option value="'.$data['role_level'].'" disabled>'.$data['role_name'].'</option>';
-
-                                    }else{
-
-                                        echo '<option value="'.$data['role_level'].'">'.$data['role_name'].'</option>';
-
-                                    }
-    
-    
-                                }
-
-                            }else{
-
-                                foreach($options as $data){
-
-                                    echo '<option value="'.$data['role_level'].'">'.$data['role_name'].'</option>';    
-    
-                                }
-
-                            }                            
-                        ?>
-                    </select> 
-                </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <input type="submit" class="btn btn-block btn-dark" id="submit" name="submit" value="Add">
                 </div>                        
             </div>
@@ -221,7 +184,7 @@
     $(document).ready(function(){
 
         //add user function
-        $('#addUserForm').submit(function(e){
+        $('#addRoleForm').submit(function(e){
             e.preventDefault();
             $.ajax({
                 type    : "POST",
@@ -231,7 +194,7 @@
                     var jsonData = JSON.parse(response);
                     $('#alert').html(jsonData.Result);
                     $('#alert').attr("class", jsonData.Status);
-                    $("#addUserForm").load(location.href+" #addUserForm>*","");
+                    $("#addRoleForm").load(location.href+" #addRoleForm>*","");
                 }
             });
         });

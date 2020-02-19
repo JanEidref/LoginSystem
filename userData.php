@@ -59,8 +59,8 @@
                     Rbac Menu
                 </a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">View Role</a>
-                    <a class="dropdown-item" href="#">Add Role</a>
+                    <a class="dropdown-item" href="roles.php">View Role</a>
+                    <a class="dropdown-item" href="addRolePage.php">Add Role</a>
                     <a class="dropdown-item" href="#">Edit Role</a>
                     <a class="dropdown-item" href="#">Delete Role</a>
                 </div>
@@ -108,42 +108,25 @@
                 echo '        <input type="password" id="editPassword" class="form-control" name="newPassword" placeholder="Input only if you want to change password!" autocomplete="off">';
                 echo '    </div>';
                 echo '    <div class="row">';
+                echo '      <div id="selectEdit" class="col-sm-6">';
+                echo '          <select class="browser-default custom-select" name="role">';
+                echo '              <option value="0" selected>--User Roles--</option>';
+                $option = $rbac->getAllRoles();
+                foreach($option as $roleData){
 
-                switch($data['role']){
+                    if($data['role'] == $roleData['role_level']){
 
-                    case 1:
-                        echo '        <div id="selectEdit" class="col-sm-6">';
-                        echo '            <select class="browser-default custom-select" name="editRole">';
-                        echo '                <option value="0">--User Roles--</option>';
-                        echo '                <option value="1" selected>Admin</option>';
-                        echo '                <option value="2">Employee</option>';
-                        echo '                <option value="3">Guest</option>';
-                        echo '            </select>'; 
-                        echo '        </div>';
-                        break;
+                        echo '<option value="'.$roleData['role_level'].'" selected>'.$roleData['role_name'].'</option>';
 
-                    case 2:
-                        echo '        <div id="selectEdit" class="col-sm-6">';
-                        echo '            <select class="browser-default custom-select" name="editRole">';
-                        echo '                <option value="0">--User Roles--</option>';
-                        echo '                <option value="1">Admin</option>';
-                        echo '                <option value="2" selected>Employee</option>';
-                        echo '                <option value="3">Guest</option>';
-                        echo '            </select>'; 
-                        echo '        </div>';
-                        break;
+                    }else{
 
-                    case 3:
-                        echo '        <div id="selectEdit" class="col-sm-6">';
-                        echo '            <select class="browser-default custom-select" name="editRole">';
-                        echo '                <option value="0">--User Roles--</option>';
-                        echo '                <option value="1">Admin</option>';
-                        echo '                <option value="2">Employee</option>';
-                        echo '                <option value="3" selected>Guest</option>';
-                        echo '            </select>'; 
-                        echo '        </div>';
-                        break;
+                        echo '<option value="'.$roleData['role_level'].'">'.$roleData['role_name'].'</option>';
+
+                    }
+
                 }
+                echo '          </select>';
+                echo '        </div>';
                 echo '        <div class="col-sm-6">';
                 echo '            <input type="submit" class="btn btn-block btn-dark" id="editSubmit" name="editSubmit" value="Edit">';
                 echo '        </div>';        

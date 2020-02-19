@@ -59,8 +59,8 @@
                     echo '          Rbac Menu';
                     echo '      </a>';
                     echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item" href="#">View Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Add Role</a>';
+                    echo '      <a class="dropdown-item" href="roles.php">View Role</a>';
+                    echo '      <a class="dropdown-item" href="addRolePage.php">Add Role</a>';
                     echo '      <a class="dropdown-item" href="#">Edit Role</a>';
                     echo '      <a class="dropdown-item" href="#">Delete Role</a>';
                     echo '  </div>';
@@ -107,7 +107,7 @@
                     echo '</ul>';
                     break;
 
-                case 3:
+                default:
                     echo '<ul class="navbar-nav text-uppercase">';
                     echo '  <li class="nav-item active">';
                     echo '      <a class="nav-link" href="main.php">Home</a>';

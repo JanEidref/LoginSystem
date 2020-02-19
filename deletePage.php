@@ -58,8 +58,8 @@
                     Rbac Menu
                 </a>
                 <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">View Role</a>
-                    <a class="dropdown-item" href="#">Add Role</a>
+                    <a class="dropdown-item" href="roles.php">View Role</a>
+                    <a class="dropdown-item" href="addRolePage.php">Add Role</a>
                     <a class="dropdown-item" href="#">Edit Role</a>
                     <a class="dropdown-item" href="#">Delete Role</a>
                 </div>
