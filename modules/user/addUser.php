@@ -25,8 +25,14 @@
         $roleToAdd = $_POST['role']; 
         
         try{
-            $user = new User(1);
-            $user->addUSer($userName, $password, $firstName, $lastName, $roleToAdd);        
+            $rbac     ->checkIfSelected($roleToAdd);
+            $user     ->checkFields($userName, $password, $firstName, $lastName);
+            $user     ->checkUserName($userName);        
+            $rbac     ->addUSerRole($roleToAdd);
+            $user     ->addUSer($userName, $password);  
+            $user     ->addUserProfile($firstName, $lastName);  
+            $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
+            echo json_encode($response);      
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");
             echo json_encode($response);

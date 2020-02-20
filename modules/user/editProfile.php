@@ -16,9 +16,14 @@
         $userName   = $_POST['editUserName'];
         $password   = $_POST['newPassword'];
     
-        try{
-            $user = new User($uid);        
-            $user->editUserProfile($uid, $firstName, $lastName, $userName, $password);
+        try{     
+            $name     = $user->getUsersName();
+            $user     ->checkEditFields($userName, $firstName, $lastName);
+            $user     ->checkEditUserName($userName, $uid);
+            $user     ->editUser($uid, $userName, $password);
+            $user     ->editProfile($uid, $firstName, $lastName);
+            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Your Profile!", 'Status' => "alert alert-success");
+            echo json_encode($response);
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");
             echo json_encode($response);              

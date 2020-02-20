@@ -1,4 +1,5 @@
 <?php
+
     class User{
 
         //Properties of Class User
@@ -48,35 +49,22 @@
        }
 
        //validate if fields are empty
-       function checkFields($userName, $password, $firstName, $lastName, $role){
+       function checkFields($userName, $password, $firstName, $lastName){
 
             if(!$userName == TRUE || !$password == TRUE || !$firstName == TRUE || !$lastName == TRUE){
                 throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
-            }else if($role == 0){
-                throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
-            }    
+            }  
 
        }
 
        //validate if edit fields are empty
-       function checkEditFields($userName, $firstName, $lastName, $role){
+       function checkEditFields($userName, $firstName, $lastName){
 
             if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
                 throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
-            }else if($role == 0){
-                throw new Exception("<strong>Error:</strong> Please Select A Role For The User!");
-            }    
+            } 
 
        }
-
-       //validate if edit fields are empty
-       function checkProfileFields($userName, $firstName, $lastName){
-
-            if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
-            }
-
-        }
 
        //check if username is already taken
        function checkUserName($userName){
@@ -106,22 +94,30 @@
 
         }
 
-       //get max uid
-       function getMaxUid(){
+       //get max uid user
+       function getMaxUidUser(){
 
-        $selectUsers       = "SELECT max(uid) as max FROM users";
-        $selectUsersResult = mysqli_query($this->connection, $selectUsers);
-        $data              = mysqli_fetch_assoc($selectUsersResult);
-        return $data['max'] + 1;
+            $selectUsers       = "SELECT max(uid) as max FROM users";
+            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
+            $data              = mysqli_fetch_assoc($selectUsersResult);
+            return $data['max'] + 1;
 
        }
 
-       //add data of user
-       function addUser($userName, $password, $firstName, $lastName, $role){
+       //get max uid user_profile
+       function getMaxUidProfile(){
 
-            $this->checkFields($userName, $password, $firstName, $lastName, $role);
-            $this->checkUserName($userName);
-            $uid = $this->getMaxUid();
+            $selectUsers       = "SELECT max(uid) as max FROM user_profile";
+            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
+            $data              = mysqli_fetch_assoc($selectUsersResult);
+            return $data['max'] + 1;
+    
+        }
+
+       //add login data of user
+       function addUser($userName, $password){
+
+            $uid     = $this->getMaxUidUser();
 
             $encrypt = password_hash($password, PASSWORD_DEFAULT);
         
@@ -129,102 +125,45 @@
             $user->bind_param("iss",$uid,$userName,$encrypt);
             $user->execute();
 
+       }
+
+       //add user profile of user
+       function addUserProfile($firstName, $lastName){
+
+            $uid = $this->getMaxUidProfile();
+
             $profile = $this->connection->prepare("INSERT into user_profile (uid,first_name,last_name) VALUES (?,?,?)");
             $profile->bind_param("iss",$uid,$firstName,$lastName);
             $profile->execute();
 
-            $rbac    = $this->connection->prepare("INSERT into rbac (uid,role) VALUES (?,?)");
-            $rbac->bind_param("ii",$uid,$role);
-            $rbac->execute();
-
-            $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
-            echo json_encode($response);
-
        }
 
-       //Delete user by id
+       //Delete user login data
        function deleteUser(){
-
-            $name      = $this->getUsersName(); 
-            $user      = "DELETE FROM users WHERE uid='$this->uid'";
-            $profile   = "DELETE FROM user_profile WHERE uid='$this->uid'";
-            $rbac      = "DELETE FROM rbac WHERE uid='$this->uid'";
-
+ 
+            $user = "DELETE FROM users WHERE uid='$this->uid'";
             mysqli_query($this->connection, $user);
+            
+       }
+
+       //delete user profile
+       function deleteUserProfile(){
+
+            $profile = "DELETE FROM user_profile WHERE uid='$this->uid'";
             mysqli_query($this->connection, $profile);
-            mysqli_query($this->connection, $rbac);
 
-            echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";
        }
 
-       //Edit user's data
-       function editUser($uid, $firstName, $lastName, $userName, $password, $role){
+       //Edit user's login data
+       function editUser($uid, $userName, $password){
 
             $this->uid = $uid;
-            $name      = $this->getUsersName();
-            $this->checkEditUserName($userName, $uid);
-            $this->checkEditFields($userName, $firstName, $lastName, $role);
             
             if(!$password == TRUE){
 
                 $editUser    = $this->connection->prepare('UPDATE users SET username=? WHERE uid=?');
                 $editUser->bind_param("si", $userName, $uid);
                 $editUser->execute();
-    
-                $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-                $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-                $editProfile->execute();
-    
-                $editRbac    = $this->connection->prepare('UPDATE rbac SET role=? WHERE uid=?');
-                $editRbac->bind_param("ii", $role, $uid);
-                $editRbac->execute();
-     
-                $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
-                echo json_encode($response);
-
-            }else{
-
-                $encrypt     = password_hash($password, PASSWORD_DEFAULT);
-
-                $editUser    = $this->connection->prepare('UPDATE users SET username=?, password=? WHERE uid=?');
-                $editUser->bind_param("ssi", $userName, $encrypt, $uid);
-                $editUser->execute();
-    
-                $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-                $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-                $editProfile->execute();
-    
-                $editRbac    = $this->connection->prepare('UPDATE rbac SET role=? WHERE uid=?');
-                $editRbac->bind_param("ii", $role, $uid);
-                $editRbac->execute();
-     
-                $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
-                echo json_encode($response);
-
-            }
-
-       }
-
-       //Edit own profile
-       function editUserProfile($uid, $firstName, $lastName, $userName, $password){
-
-            $this->uid = $uid;
-            $name      = $this->getUsersName();
-            $this->checkEditUserName($userName, $uid);
-            $this->checkProfileFields($userName, $firstName, $lastName);
-            
-            if(!$password == TRUE){
-
-                $editUser    = $this->connection->prepare('UPDATE users SET username=? WHERE uid=?');
-                $editUser->bind_param("si", $userName, $uid);
-                $editUser->execute();
-
-                $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-                $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-                $editProfile->execute();
-    
-                $response = array('Result' => "<strong>Success:</strong> Successfully Edited Your Profile!", 'Status' => "alert alert-success");
-                echo json_encode($response);
 
             }else{
 
@@ -234,14 +173,18 @@
                 $editUser->bind_param("ssi", $userName, $encrypt, $uid);
                 $editUser->execute();
 
-                $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-                $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-                $editProfile->execute();
-    
-                $response = array('Result' => "<strong>Success:</strong> Successfully Edited Your Profile!", 'Status' => "alert alert-success");
-                echo json_encode($response);
-
             }
+
+       }
+
+       //Edit user profile
+       function editProfile($uid, $firstName, $lastName){
+
+            $this->uid = $uid;
+
+            $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
+            $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
+            $editProfile->execute();
 
        }
 

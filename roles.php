@@ -60,8 +60,8 @@
                 <div class="dropdown-menu">
                     <a class="dropdown-item active" href="#">View Role</a>
                     <a class="dropdown-item" href="addRolePage.php">Add Role</a>
-                    <a class="dropdown-item" href="#">Edit Role</a>
-                    <a class="dropdown-item" href="#">Delete Role</a>
+                    <a class="dropdown-item" href="editRolePage.php">Edit Role</a>
+                    <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>
                 </div>
              </li>
         </ul>

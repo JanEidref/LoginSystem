@@ -63,8 +63,8 @@
                     echo '  <div class="dropdown-menu">';
                     echo '      <a class="dropdown-item" href="roles.php">View Role</a>';
                     echo '      <a class="dropdown-item" href="addRolePage.php">Add Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Edit Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Delete Role</a>';
+                    echo '      <a class="dropdown-item" href="editRolePage.php">Edit Role</a>';
+                    echo '      <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>';
                     echo '  </div>';
                     echo '  </li>';
                     echo '</ul>';
@@ -220,7 +220,7 @@
 
     $(document).ready(function(){
 
-        //add user function
+        //add user
         $('#addUserForm').submit(function(e){
             e.preventDefault();
             $.ajax({

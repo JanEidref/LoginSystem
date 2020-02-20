@@ -32,7 +32,7 @@
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <title>Add Page</title>
+    <title>Add Role</title>
 </head>
 <body>
     <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
@@ -63,8 +63,8 @@
                     echo '  <div class="dropdown-menu">';
                     echo '      <a class="dropdown-item" href="roles.php">View Role</a>';
                     echo '      <a class="dropdown-item active" href="#" active>Add Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Edit Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Delete Role</a>';
+                    echo '      <a class="dropdown-item" href="editRolePage.php">Edit Role</a>';
+                    echo '      <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>';
                     echo '  </div>';
                     echo '  </li>';
                     echo '</ul>';
@@ -183,12 +183,12 @@
 
     $(document).ready(function(){
 
-        //add user function
+        //add role
         $('#addRoleForm').submit(function(e){
             e.preventDefault();
             $.ajax({
                 type    : "POST",
-                url     : 'modules/user/addUser.php',
+                url     : 'modules/rbac/addRole.php',
                 data    : $(this).serialize(),
                 success : function(response){
                     var jsonData = JSON.parse(response);

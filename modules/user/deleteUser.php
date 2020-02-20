@@ -20,7 +20,12 @@
     }else{
         $id   = $_POST['id'];
         $user = new User($id);        
-        $user ->deleteUser();   
+        $rbac = new Rbac($id);        
+        $name = $user->getUsersName();
+        $rbac ->deleteUserRole();   
+        $user ->deleteUser(); 
+        $user ->deleteUserProfile(); 
+        echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";  
     }
      
 ?>

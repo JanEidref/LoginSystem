@@ -22,11 +22,18 @@
         $lastName   = $_POST['editLastName'];
         $userName   = $_POST['editUserName'];
         $password   = $_POST['newPassword'];
-        $roleToEdit = $_POST['editRole'];
+        $roleToEdit = $_POST['role'];
     
-        try{
-            $user = new User($uid);        
-            $user->editUser($uid, $firstName, $lastName, $userName, $password, $roleToEdit);
+        try{      
+            $name     = $user->getUsersName();        
+            $rbac     ->checkIfSelected($roleToEdit);        
+            $user     ->checkEditFields($userName, $firstName, $lastName);        
+            $user     ->checkEditUserName($userName, $uid);        
+            $rbac     ->editUserRole($uid, $roleToEdit);        
+            $user     ->editUser($uid, $userName, $password);
+            $user     ->editProfile($uid, $firstName, $lastName);
+            $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
+            echo json_encode($response);
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");
             echo json_encode($response);              

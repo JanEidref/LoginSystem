@@ -60,8 +60,8 @@
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="roles.php">View Role</a>
                     <a class="dropdown-item" href="addRolePage.php">Add Role</a>
-                    <a class="dropdown-item" href="#">Edit Role</a>
-                    <a class="dropdown-item" href="#">Delete Role</a>
+                    <a class="dropdown-item" href="editRolePage.php">Edit Role</a>
+                    <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>
                 </div>
              </li>
         </ul>
@@ -126,6 +126,7 @@
 <script>
     $(document).ready(function(){
 
+        //delete user
         $(document).on("click", ".delete", function(){
 
             if (confirm("Are you sure you want to delete user?")) {

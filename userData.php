@@ -61,8 +61,8 @@
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="roles.php">View Role</a>
                     <a class="dropdown-item" href="addRolePage.php">Add Role</a>
-                    <a class="dropdown-item" href="#">Edit Role</a>
-                    <a class="dropdown-item" href="#">Delete Role</a>
+                    <a class="dropdown-item" href="editRolePage.php">Edit Role</a>
+                    <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>
                 </div>
              </li>
         </ul>
@@ -87,6 +87,7 @@
             $edit = new User($editId);
             
             foreach($edit->getData() as $data){
+
                 echo '<form method="POST" id="editUserForm">';
                 echo '   <h5 id="editName" class="text-primary text-center"></h5>';
                 echo '    <input type="text" id="uid" name="uid" value="'.$editId.'" hidden>';
@@ -132,6 +133,7 @@
                 echo '        </div>';        
                 echo '    </div>';
                 echo '</form>';
+
             }
         ?>
         <div id="undo" class="mt-2 mb-2"><a href="editPage.php" class="undo btn btn block btn-danger" name="undo">Back</a></div>
@@ -141,7 +143,7 @@
 
     $(document).ready(function(){
 
-        //edit user function
+        //edit user
         $('#editUserForm').submit(function(e){
             e.preventDefault();
             $.ajax({
