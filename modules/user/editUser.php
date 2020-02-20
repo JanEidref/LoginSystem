@@ -24,7 +24,8 @@
         $password   = $_POST['newPassword'];
         $roleToEdit = $_POST['role'];
     
-        try{      
+        try{ 
+            $user     = new User($uid);
             $name     = $user->getUsersName();        
             $rbac     ->checkIfSelected($roleToEdit);        
             $user     ->checkEditFields($userName, $firstName, $lastName);        
