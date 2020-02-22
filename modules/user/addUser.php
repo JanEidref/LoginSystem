@@ -1,18 +1,20 @@
 <?php
 
     session_start();
-    include 'class.user.php';
+    require_once '../database/database.php';
     include '../rbac/class.rbac.php';
+    include 'class.user.php';
 
     $uid  = $_SESSION['uid'];
+    $role = $_SESSION['uid'];
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
+    $data = $rbac->getAccess($role);
     
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($role > 2){
+    }else if($data['add_user'] == 0){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
         exit();               
@@ -25,12 +27,12 @@
         $roleToAdd = $_POST['role']; 
         
         try{
-            $rbac     ->checkIfSelected($roleToAdd);
             $user     ->checkFields($userName, $password, $firstName, $lastName);
             $user     ->checkUserName($userName);        
-            $rbac     ->addUSerRole($roleToAdd);
+            $rbac     ->checkIfSelected($roleToAdd);
             $user     ->addUSer($userName, $password);  
             $user     ->addUserProfile($firstName, $lastName);  
+            $rbac     ->addUSerRole($roleToAdd);
             $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
             echo json_encode($response);      
         }catch (Exception $e){

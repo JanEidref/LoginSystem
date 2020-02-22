@@ -1,53 +1,27 @@
 <?php
-    class Login{
-
-        //Properties of class Login
-        private $connection;
-          
-        
-        //Connect to Database and Logs user in
-        function __construct(){
-
-            // $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-            $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-
-            if(!$this->connection){
-                die("Error: " .mysqli_error($this->connection));
-            }
-
-        }
-
-        function verifyPassword($password, $hash, $uid){
-
-            if(password_verify($password, $hash)){
-                session_start();
-                $_SESSION['uid']     = $uid;
-                $_SESSION['access']  = 1;
-                header('Location: ../../main.php');
-            }else{
-                session_start();
-                $_SESSION['Error'] = "Wrong Password!";
-                header('Location: ../../index.php');
-            }
-
-        }
+    class Login extends Database{
 
         function checkLogin($userName, $password){
 
-            $query   = $this->connection->prepare("SELECT * FROM users WHERE username=?");
-            $query   ->bind_param("s",$userName);
-            $query   ->execute();                        
-            $row     = $query->get_result();
-            $data    = $row->fetch_array(MYSQLI_ASSOC);
+            $this->connection->where("username", $userName);
+            $data = $this->connection->getOne("users");
 
-            if($row->num_rows > 0){
+            if(!is_null($data)){
 
-                $this->verifyPassword($password, $data['password'], $data['uid']);
+                if(password_verify($password, $data['password'])){
+
+                    return 1;
+
+                }else{
+
+                    return 2;
+
+                }
 
             }else{
-                session_start();
-                $_SESSION['Error'] = "No Such User!";
-                header('Location: ../../index.php');
+
+                return 3;
+
             }
 
         }

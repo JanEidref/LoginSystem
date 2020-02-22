@@ -1,26 +1,26 @@
 <?php
     session_start();
+    include 'modules/database/database.php';
     include 'modules/user/class.user.php';
     include 'modules/rbac/class.rbac.php';
 
+    $rbac   = new Rbac();
     $uid    = $_SESSION['uid'];
+    $access = $_SESSION['access'];
+    $name   = $_SESSION['name'];
+    $role   = $_SESSION['role'];
     $editId = $_GET['uid'];
+    $data   = $rbac->getAccess($role);
 
-    $user   = new User($uid);
-    $rbac   = new Rbac($uid);
-    $role   = $rbac->getUserRoleNumber();
-    
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
-        exit();          
-    }else if($role > 1){
+        exit();  
+    }else if($data['edit_user'] == 0){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
-        exit();               
-    }else{
-        $name = $user->getUsersName();
-    }
+        exit();         
 
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,42 +36,9 @@
     <title>Edit Page</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
-        <?php
-            echo '<a class="navbar-brand" href="profilePage.php">Hello, '.$name.'!</a>'; 
-        ?> 
-        <ul class="navbar-nav text-uppercase">
-            <li class="nav-item">
-                <a class="nav-link" href="main.php">Home</a>
-            </li>
-            <li class="nav-item dropdown active">
-                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                    User Menu
-                </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="addPage.php">Add User</a>
-                    <a class="dropdown-item active" href="#">Edit User</a>
-                    <a class="dropdown-item" href="deletePage.php">Delete User</a>
-                </div>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
-                    Rbac Menu
-                </a>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="roles.php">View Role</a>
-                    <a class="dropdown-item" href="addRolePage.php">Add Role</a>
-                    <a class="dropdown-item" href="editRolePage.php">Edit Role</a>
-                    <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>
-                </div>
-             </li>
-        </ul>
-        <ul class="navbar-nav ml-auto">
-        <li class="nav-item active">
-        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>
-        </li>
-        </ul>
-    </nav>
+    <?php
+        include 'modules/includes/navbar.php';
+    ?>
     
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">Edit User</h2>
@@ -82,59 +49,8 @@
                 </div>
             </div>                    
         </div>
-        <?php
-            
-            $edit = new User($editId);
-            
-            foreach($edit->getData() as $data){
-
-                echo '<form method="POST" id="editUserForm">';
-                echo '   <h5 id="editName" class="text-primary text-center"></h5>';
-                echo '    <input type="text" id="uid" name="uid" value="'.$editId.'" hidden>';
-                echo '    <div class="input-group mb-3">';
-                echo '        <div class="input-group-prepend">';
-                echo '            <span class="input-group-text">Name</span>';
-                echo '        </div>';
-                echo '        <input type="text" id="editFirstName" class="form-control" value="'.$data['first_name'].'" name="editFirstName"  placeholder="First Name"  autocomplete="off">';
-                echo '        <input type="text" id="editLastName" class="form-control" value="'.$data['last_name'].'"  name="editLastName" placeholder="Last Name" autocomplete="off">';
-                echo '    </div>';
-                echo '    <div class="input-group mb-3">';
-                echo '        <div class="input-group-prepend">';
-                echo '            <span class="input-group-text">Username</span>';
-                echo '        </div>';
-                echo '        <input type="text" id="editUserName" value="'.$data['username'].'"  class="form-control" name="editUserName" autocomplete="off">';
-                echo '        <div class="input-group-prepend">';
-                echo '            <span class="input-group-text">Password</span>';
-                echo '        </div>';
-                echo '        <input type="password" id="editPassword" class="form-control" name="newPassword" placeholder="Input only if you want to change password!" autocomplete="off">';
-                echo '    </div>';
-                echo '    <div class="row">';
-                echo '      <div id="selectEdit" class="col-sm-6">';
-                echo '          <select class="browser-default custom-select" name="role">';
-                echo '              <option value="0" selected>--User Roles--</option>';
-                $option = $rbac->getAllRoles();
-                foreach($option as $roleData){
-
-                    if($data['role'] == $roleData['role_level']){
-
-                        echo '<option value="'.$roleData['role_level'].'" selected>'.$roleData['role_name'].'</option>';
-
-                    }else{
-
-                        echo '<option value="'.$roleData['role_level'].'">'.$roleData['role_name'].'</option>';
-
-                    }
-
-                }
-                echo '          </select>';
-                echo '        </div>';
-                echo '        <div class="col-sm-6">';
-                echo '            <input type="submit" class="btn btn-block btn-dark" id="editSubmit" name="editSubmit" value="Edit">';
-                echo '        </div>';        
-                echo '    </div>';
-                echo '</form>';
-
-            }
+        <?php            
+            include 'modules/includes/editUserForm.php';
         ?>
         <div id="undo" class="mt-2 mb-2"><a href="editPage.php" class="undo btn btn block btn-danger" name="undo">Back</a></div>
     </div>    
@@ -142,6 +58,9 @@
 <script>
 
     $(document).ready(function(){
+
+        $('#user').attr("class", "nav-item dropdown active");
+        $('#editUser').attr("class", "dropdown-item active");         
 
         //edit user
         $('#editUserForm').submit(function(e){

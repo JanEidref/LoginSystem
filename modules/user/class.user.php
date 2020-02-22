@@ -1,50 +1,37 @@
 <?php
 
-    class User{
+    class User extends Database{
 
-        //Properties of Class User
-        private $connection, $uid;
-          
-        
-        //Connect to Database and set id
-        function __construct($uid){
+        //Get uid by username
+        function getUid($userName){
 
-            // $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-            $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-            $this->uid        = $uid;
-
-            if(!$this->connection){
-                die("Error: " .mysqli_error($this->connection));
-            }
+            $this ->connection->where("username", $userName);
+            $data = $this->connection->getOne("users");
+            return $data['uid'];                
 
         }
-        
+   
         //Get name of certain User
-        function getUsersName(){
+        function getUsersName($uid){
 
-            $query  = "SELECT first_name, last_name FROM user_profile WHERE uid='$this->uid'";
-            $result = mysqli_query($this->connection, $query);     
-            $data   = mysqli_fetch_assoc($result);
-            return $data['first_name']." ".$data['last_name'];
+            $this ->connection->where("uid", $uid);
+            $data = $this->connection->getOne("user_profile");
+            return $data['first_name']." ".$data['last_name'];    
 
         }
 
         //Get all users data
         function getAllData(){
 
-            $query  = "SELECT * FROM complete_data";
-            $result = mysqli_query($this->connection, $query);
-            return $result;
+           return $this->connection->get("complete_data");
 
        }
 
        //get data of certain user
-       function getData(){
+       function getData($uid){
 
-            $query = $this->connection->prepare("SELECT * FROM complete_data where uid=?");
-            $query ->bind_param("i", $this->uid);
-            $query ->execute();
-            return $query->get_result()->fetch_all(MYSQLI_ASSOC);
+          $this->connection->where("uid", $uid);
+          return $this->connection->getOne("complete_data");
 
        }
 
@@ -69,12 +56,10 @@
        //check if username is already taken
        function checkUserName($userName){
 
-            $query = $this->connection->prepare("SELECT username FROM users WHERE username=?");
-            $query -> bind_param("s", $userName);
-            $query ->execute();                        
-            $row   = $query->get_result();
+            $this->connection->where("username", $userName);
+            $data = $this->connection->getOne("users");
 
-            if($row->num_rows > 0){
+            if(!is_null($data)){
                 throw new Exception("<strong>Error:</strong> Username Already Taken!");
             }
 
@@ -97,60 +82,51 @@
        //get max uid user
        function getMaxUidUser(){
 
-            $selectUsers       = "SELECT max(uid) as max FROM users";
-            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
-            $data              = mysqli_fetch_assoc($selectUsersResult);
-            return $data['max'] + 1;
+          return $this->connection->getValue("users", "max(uid)");
 
        }
 
        //get max uid user_profile
        function getMaxUidProfile(){
 
-            $selectUsers       = "SELECT max(uid) as max FROM user_profile";
-            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
-            $data              = mysqli_fetch_assoc($selectUsersResult);
-            return $data['max'] + 1;
+          return $this->connection->getValue("user_profile", "max(uid)");
     
-        }
+       }
 
        //add login data of user
        function addUser($userName, $password){
 
-            $uid     = $this->getMaxUidUser();
+            $uid     = $this->getMaxUidUser() + 1;
 
             $encrypt = password_hash($password, PASSWORD_DEFAULT);
-        
-            $user    = $this->connection->prepare("INSERT into users (uid,username,password) VALUES (?,?,?)");
-            $user->bind_param("iss",$uid,$userName,$encrypt);
-            $user->execute();
+            $data    = array("uid" => $uid, "username" => $userName, "password" => $encrypt);
+            $this->connection->insert("users", $data); 
 
        }
 
        //add user profile of user
        function addUserProfile($firstName, $lastName){
 
-            $uid = $this->getMaxUidProfile();
+            $uid  = $this->getMaxUidProfile() + 1;
 
-            $profile = $this->connection->prepare("INSERT into user_profile (uid,first_name,last_name) VALUES (?,?,?)");
-            $profile->bind_param("iss",$uid,$firstName,$lastName);
-            $profile->execute();
+            $data = array("uid" => $uid, "first_name" => $firstName, "last_name" => $lastName);
+            $this->connection->insert("user_profile", $data); 
 
        }
 
        //Delete user login data
-       function deleteUser(){
+       function deleteUser($uid){
  
-            $user = "DELETE FROM users WHERE uid='$this->uid'";
-            mysqli_query($this->connection, $user);
+            $this->connection->where("uid", $uid);
+            $this->connection->delete("users");
             
        }
 
        //delete user profile
-       function deleteUserProfile(){
+       function deleteUserProfile($uid){
 
-            $profile = "DELETE FROM user_profile WHERE uid='$this->uid'";
-            mysqli_query($this->connection, $profile);
+            $this->connection->where("uid", $uid);
+            $this->connection->delete("user_profile");
 
        }
 

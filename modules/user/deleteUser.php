@@ -1,30 +1,29 @@
 <?php
 
     session_start();
-    include 'class.user.php';
+    require_once '../database/database.php';
     include '../rbac/class.rbac.php';
+    include 'class.user.php';
 
-    $uid = $_SESSION['uid'];
-
+    $uid  = $_SESSION['uid'];
+    $role = $_SESSION['uid'];
     $user = new User($uid);
     $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
+    $data = $rbac->getAccess($role);
     
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($role > 1){
+    }else if($data['delete_user'] == 0){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
         exit();               
     }else{
-        $id   = $_POST['id'];
-        $user = new User($id);        
-        $rbac = new Rbac($id);        
-        $name = $user->getUsersName();
-        $rbac ->deleteUserRole();   
-        $user ->deleteUser(); 
-        $user ->deleteUserProfile(); 
+        $id   = $_POST['id'];       
+        $name = $user->getUsersName($id);
+        $rbac ->deleteUserRole($id);   
+        $user ->deleteUser($id); 
+        $user ->deleteUserProfile($id); 
         echo "<strong>Success:</strong> Successfully Deleted User ".$name."!";  
     }
      

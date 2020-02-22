@@ -1,36 +1,20 @@
 <?php
-    class Rbac{
+    class Rbac extends Database{
 
-        //Properties of class rbac
-        private $connection, $uid;
-          
-        
-        //Connect to Database and set id
-        function __construct($uid){
+        //Get number value of User's Role
+        function getUserRoleNumber($uid){
 
-            // $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-            $this->connection = mysqli_connect("localhost", "root", "admin", "login");
-            $this->uid        = $uid;
-
-            if(!$this->connection){
-                die("Error: " .mysqli_error($this->connection));
-            }
+            $this ->connection->where("uid", $uid);
+            $data = $this->connection->getOne("rbac");
+            return $data['role'];
 
         }
 
-        //Get number value of User's Role
-        function getUserRoleNumber(){
+        //check access of role
+        function getAccess($role){
 
-            $query  = "SELECT role FROM rbac WHERE uid='$this->uid'";
-            $result = mysqli_query($this->connection, $query);
-            
-            if(mysqli_num_rows($result) > 0){
-
-                $data = mysqli_fetch_assoc($result);
-
-                return $data['role'];
-
-            }
+           $this->connection->where("role_level", $role);
+           return $this->connection->getOne("roles");
 
         }
 
@@ -47,19 +31,14 @@
         //get all roles
         function getAllRoles(){
 
-            $query = "SELECT * FROM roles";
-            $result = mysqli_query($this->connection, $query);
-            return $result;
+            return $this->connection->get("roles");
 
         }
 
         //get max uid
         function getMaxUid(){
 
-            $selectUsers       = "SELECT max(uid) as max FROM rbac";
-            $selectUsersResult = mysqli_query($this->connection, $selectUsers);
-            $data              = mysqli_fetch_assoc($selectUsersResult);
-            return $data['max'] + 1;
+            return $this->connection->getValue("rbac","max(uid)");
 
         }
 
@@ -184,11 +163,10 @@
        //add user's role
        function addUserRole($role){
 
-           $uid = $this->getMaxUid();
+           $uid = $this->getMaxUid() + 1;
 
-           $rbac = $this->connection->prepare("INSERT into rbac (uid,role) VALUES (?,?)");
-           $rbac->bind_param("ii",$uid,$role);
-           $rbac->execute();
+           $data = array("uid" => $uid, "role" => $role);
+           $this->connection->insert("rbac", $data);
 
        }
 
@@ -204,10 +182,10 @@
        }
 
        //delete user's role
-       function deleteUserRole(){
+       function deleteUserRole($uid){
 
-           $rbac = "DELETE FROM rbac WHERE uid='$this->uid'";
-           mysqli_query($this->connection, $rbac);
+           $this->connection->where("uid", $uid);
+           $this->connection->delete("rbac");
 
        }
 
