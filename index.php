@@ -6,8 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>    
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="css/login.css">
     <link   rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" 
             integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -22,10 +23,24 @@
                                 echo '<div class="row">';
                                 echo '  <div id="alert" class="col-sm-12 mt-2">';
                                 echo '      <div class="alert alert-danger">';
+                                echo '          <button type="button" class="close" data-dismiss="alert">&times;</button>';
                                 echo '          <strong>Error:</strong> '.$_SESSION['Error'];
                                 echo '      </div>';
                                 echo '  </div>';                    
                                 echo '</div>';                    
+                            }
+
+                            if(!isset($_SESSION['access'])){
+                   
+                            }else if($_SESSION['access'] > 1){
+                                echo '<div class="row">';
+                                echo '  <div id="alert" class="col-sm-12 mt-2">';
+                                echo '      <div class="alert alert-danger">';
+                                echo '          <button type="button" class="close" data-dismiss="alert">&times;</button>';
+                                echo '          <strong>Error:</strong> Acess Denied!';
+                                echo '      </div>';
+                                echo '  </div>';                    
+                                echo '</div>'; 
                             }
                         ?>
                         <form action="modules/login/login.php" id="inputForm" class="form-signin mb-4" method="POST"> 

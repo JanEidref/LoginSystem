@@ -45,14 +45,13 @@
         //validate role name
         function checkRoleName($roleName){
 
-            $query = $this->connection->prepare("SELECT * FROM roles WHERE role_name=?");
-            $query ->bind_param("s", $roleName); 
-            $query ->execute();
-            $row   = $query->get_result();
+            $this->connection->where("role_name", $roleName);
+            $data = $this->connection->getOne("roles");
 
-            if($row->num_rows > 0){
-                throw new Exception("<strong>Error:</strong> Role Name Already Exist!");
-            }
+            if(!is_null($data)){
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Role Name Already Exist!');
+            }           
 
         }
 
@@ -66,7 +65,8 @@
             $row   = $query->get_result();
 
             if($row->num_rows > 0){
-                throw new Exception("<strong>Error:</strong> Role Name Already Exist!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Role Name Already Exist!');
             }
 
         }
@@ -74,13 +74,12 @@
         //validate role level
         function checkRoleLevel($roleLevel){
 
-            $query = $this->connection->prepare("SELECT * FROM roles WHERE role_level=?");
-            $query ->bind_param("i", $roleLevel); 
-            $query ->execute();
-            $row   = $query->get_result();
+            $this->connection->where("role_level", $roleLevel);
+            $data = $this->connection->getOne("roles");
 
-            if($row->num_rows > 0){
-                throw new Exception("<strong>Error:</strong> Role Level Already Exist!");
+            if(!is_null($data)){
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Role Level Already Exist!');
             }
 
         }
@@ -94,7 +93,8 @@
             $row   = $query->get_result();
 
             if($row->num_rows > 0){
-                throw new Exception("<strong>Error:</strong> Role Level Already Exist!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Role Level Already Exist!');
             }
 
         }
@@ -103,7 +103,8 @@
         function checkRoleFields($roleName, $roleLevel){
 
             if(!$roleName || !$roleLevel){
-                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> No Blank Fields Please!');
             }
 
         }
@@ -118,7 +119,8 @@
             
             if($row->num_rows > 0){
 
-                throw new Exception("<strong>Error:</strong> Certain user still assign to this Role!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Certain user still assign to this Role!');
 
             }
 
@@ -128,7 +130,8 @@
         function checkIfSelected($role){
 
             if($role == 0){
-                throw new Exception("<strong>Error:</strong> Please Select a Role for User!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Please Select a Role for User!');
             }
 
         }
@@ -136,9 +139,8 @@
         //add a role
         function addRole($roleName, $roleLevel){
 
-            $query = $this->connection->prepare("INSERT INTO roles (role_name,role_level) VALUES (?,?)");
-            $query ->bind_param("si", $roleName, $roleLevel);
-            $query ->execute();
+            $data = array("role_name" => $roleName, "role_level" => $roleLevel);
+            $this->connection->insert("roles", $data);
 
         }
 
@@ -173,11 +175,10 @@
        //edit user's role
        function editUserRole($uid,$role){
 
-           $this->checkIfSelected($role);
-    
-           $editRbac = $this->connection->prepare('UPDATE rbac SET role=? WHERE uid=?');
-           $editRbac ->bind_param("ii", $role, $uid);
-           $editRbac ->execute();
+            $data = array("role" => $role);
+
+            $this->connection->where("uid", $uid);
+            $this->connection->update("rbac", $data);
 
        }
 

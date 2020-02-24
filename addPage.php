@@ -6,19 +6,18 @@
 
     $rbac   = new Rbac();
     $uid    = $_SESSION['uid'];
-    $access = $_SESSION['access'];
     $name   = $_SESSION['name'];
     $role   = $_SESSION['role'];
     $data   = $rbac->getAccess($role);
 
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }else if($data['add_user'] == 0){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
-        exit();         
-
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();
     }
 ?>
 <!DOCTYPE html>
@@ -97,6 +96,7 @@
                 data    : $(this).serialize(),
                 success : function(response){
                     var jsonData = JSON.parse(response);
+                    $('#alert').show();
                     $('#alert').html(jsonData.Result);
                     $('#alert').attr("class", jsonData.Status);
                     $("#addUserForm").load(location.href+" #addUserForm>*","");
@@ -104,7 +104,15 @@
             });
         });
 
+        $(document).on("click", ".close", function(){
+
+            $('#alert').hide();
+
+        });
+
     });
+
+   
 
 </script>
 </html>

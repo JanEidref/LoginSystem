@@ -5,16 +5,17 @@
     include '../rbac/class.rbac.php';
     include 'class.user.php';
 
-    $uid  = $_SESSION['uid'];
-    $role = $_SESSION['uid'];
-    $user = new User($uid);
-    $rbac = new Rbac($uid);
-    $data = $rbac->getAccess($role);
+    $uid   = $_SESSION['uid'];
+    $role  = $_SESSION['uid'];
+    $check = $_POST['userName'];
+    $user  = new User();
+    $rbac  = new Rbac();
+
     
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($data['add_user'] == 0){
+    }else if(!isset($check)){
         $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/main.php');
         exit();               
@@ -33,7 +34,9 @@
             $user     ->addUSer($userName, $password);  
             $user     ->addUserProfile($firstName, $lastName);  
             $rbac     ->addUSerRole($roleToAdd);
-            $response = array('Result' => "<strong>Success:</strong> Successfully Added User!", 'Status' => "alert alert-success");
+            $response = array('Result' => '<button type="button" class="close">&times;</button>
+                                           <strong>Success:</strong> Successfully Added User!'
+                            , 'Status' => "alert alert-success");
             echo json_encode($response);      
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");

@@ -39,7 +39,8 @@
        function checkFields($userName, $password, $firstName, $lastName){
 
             if(!$userName == TRUE || !$password == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> No Blank Fields Please!');
             }  
 
        }
@@ -48,7 +49,8 @@
        function checkEditFields($userName, $firstName, $lastName){
 
             if(!$userName == TRUE || !$firstName == TRUE || !$lastName == TRUE){
-                throw new Exception("<strong>Error:</strong> No Blank Fields Please!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> No Blank Fields Please!');
             } 
 
        }
@@ -60,7 +62,8 @@
             $data = $this->connection->getOne("users");
 
             if(!is_null($data)){
-                throw new Exception("<strong>Error:</strong> Username Already Taken!");
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Username Already Taken!');
             }
 
        }
@@ -68,13 +71,13 @@
        //check if edit username is taken
        function checkEditUserName($userName, $uid){
 
-            $query = $this->connection->prepare("SELECT username FROM users WHERE username=? and uid!=?");
-            $query -> bind_param("si", $userName,$uid);
-            $query ->execute();                        
-            $row   = $query->get_result();
+            $this->connection->where("username", $userName);
+            $this->connection->where("uid != ".$uid);
+            $data = $this->connection->getOne("users");
 
-            if($row->num_rows > 0){
-                throw new Exception("<strong>Error:</strong> Username Already Taken!");
+            if(!is_null($data)){
+                throw new Exception('<button type="button" class="close">&times;</button>
+                                     <strong>Error:</strong> Username Already Taken!');
             }
 
         }
@@ -132,22 +135,21 @@
 
        //Edit user's login data
        function editUser($uid, $userName, $password){
-
-            $this->uid = $uid;
-            
+   
             if(!$password == TRUE){
 
-                $editUser    = $this->connection->prepare('UPDATE users SET username=? WHERE uid=?');
-                $editUser->bind_param("si", $userName, $uid);
-                $editUser->execute();
+                $data = array("username" => $userName);
+
+                $this->connection->where("uid", $uid);
+                $this->connection->update("users", $data);
 
             }else{
 
-                $encrypt     = password_hash($password, PASSWORD_DEFAULT);
+                $encrypt = password_hash($password, PASSWORD_DEFAULT);
+                $data    = array("username" => $userName, "password" => $encrypt);
 
-                $editUser    = $this->connection->prepare('UPDATE users SET username=?, password=? WHERE uid=?');
-                $editUser->bind_param("ssi", $userName, $encrypt, $uid);
-                $editUser->execute();
+                $this->connection->where("uid", $uid);
+                $this->connection->update("users", $data);
 
             }
 
@@ -156,11 +158,10 @@
        //Edit user profile
        function editProfile($uid, $firstName, $lastName){
 
-            $this->uid = $uid;
+            $data = array("first_name" => $firstName, "last_name" => $lastName);
 
-            $editProfile = $this->connection->prepare('UPDATE user_profile SET first_name=?, last_name=? WHERE uid=?');
-            $editProfile->bind_param("ssi", $firstName, $lastName, $uid);
-            $editProfile->execute();
+            $this->connection->where("uid", $uid);
+            $this->connection->update("user_profile", $data);
 
        }
 

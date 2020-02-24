@@ -1,20 +1,23 @@
 <?php
 
     session_start();
-    include 'class.user.php';
+    require_once '../database/database.php';
     include '../rbac/class.rbac.php';
+    include 'class.user.php';
 
-    $uid  = $_SESSION['uid'];
-    $user = new User($uid);
-    $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
+    $uid   = $_SESSION['uid'];
+    $role  = $_SESSION['uid'];
+    $check = $_POST['uid'];
+    $user  = new User();
+    $rbac  = new Rbac();
     
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
-    }else if($role > 1){
+    }else if(!isset($check)){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
+        header('Location: http://localhost/loginsystem/index.php');
         exit();               
     }else{
         $uid        = $_POST['uid'];
@@ -25,15 +28,16 @@
         $roleToEdit = $_POST['role'];
     
         try{ 
-            $user     = new User($uid);
-            $name     = $user->getUsersName();        
+            $name     = $user->getUsersName($uid);        
             $rbac     ->checkIfSelected($roleToEdit);        
             $user     ->checkEditFields($userName, $firstName, $lastName);        
             $user     ->checkEditUserName($userName, $uid);        
             $rbac     ->editUserRole($uid, $roleToEdit);        
             $user     ->editUser($uid, $userName, $password);
             $user     ->editProfile($uid, $firstName, $lastName);
-            $response = array('Result' => "<strong>Success:</strong> Successfully Edited User ".$name."!", 'Status' => "alert alert-success");
+            $response = array('Result' => '<button type="button" class="close">&times;</button>
+                                           <strong>Success:</strong> Successfully Edited User '.$name.'!', 
+                              'Status' => "alert alert-success");
             echo json_encode($response);
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");

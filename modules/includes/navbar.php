@@ -56,8 +56,13 @@
     echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
     echo '          Rbac Menu';
     echo '      </a>';
-    echo '  <div class="dropdown-menu">';
-    echo '      <a class="dropdown-item" href="roles.php" id="role">View Role</a>';
+    echo '  <div class="dropdown-menu">';    
+
+    if($data['add_role'] == 1){
+        echo '      <a class="dropdown-item" href="roles.php" id="role">View Role</a>';
+    }else{
+        echo '      <a class="dropdown-item disabled" href="roles.php" id="role">View Role</a>';
+    }
 
     if($data['add_role'] == 1){
         echo '      <a class="dropdown-item" href="addRolePage.php" id="addRole">Add Role</a>';

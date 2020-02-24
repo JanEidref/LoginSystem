@@ -10,6 +10,7 @@
     $role   = $_SESSION['role'];
 
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }
@@ -34,7 +35,6 @@
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">All Users</h2>
         <?php
-            include 'modules/includes/access.php';
             include 'modules/includes/userTable.php';
         ?>
     </div>    

@@ -1,12 +1,16 @@
 <?php
 
     session_start();
+    require_once '../database/database.php';
+    include '../rbac/class.rbac.php';
     include 'class.user.php';
 
     $uid  = $_SESSION['uid'];
-    $user = new User($uid);
+    $user = new User();
+    $rbac = new Rbac();
     
     if(!$uid){
+        $_SESSION['access'] = 2;       
         header('Location: http://localhost/loginsystem/index.php');
         exit();          
     }else{
@@ -17,7 +21,7 @@
         $password   = $_POST['newPassword'];
     
         try{     
-            $name     = $user->getUsersName();
+            $name     = $user->getUsersName($uid);
             $user     ->checkEditFields($userName, $firstName, $lastName);
             $user     ->checkEditUserName($userName, $uid);
             $user     ->editUser($uid, $userName, $password);

@@ -26,7 +26,8 @@
             $rbac     ->checkEditRoleName($id, $roleName);
             $rbac     ->checkEditRoleLevel($id, $roleLevel);
             $rbac     ->editRole($id, $roleName, $roleLevel);        
-            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Role!", 'Status' => "alert alert-success");
+            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Role!", 
+                              'Status' => "alert alert-success alert-dismissable");
             echo json_encode($response);
         }catch (Exception $e){
             $response = array('Result' => $e->getMessage(), 'Status' => "alert alert-danger");

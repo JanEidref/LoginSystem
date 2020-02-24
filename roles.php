@@ -4,14 +4,20 @@
     include 'modules/user/class.user.php';
     include 'modules/rbac/class.rbac.php';
 
-    $uid    = $_SESSION['uid'];
-    $access = $_SESSION['access'];
-    $name   = $_SESSION['name'];
-    $role   = $_SESSION['role'];
+    $rbac = new Rbac();
+    $uid  = $_SESSION['uid'];
+    $name = $_SESSION['name'];
+    $role = $_SESSION['role'];
+    $data = $rbac->getAccess($uid); 
 
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();  
+    }else if($data['view_role'] == 0){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();       
     }
 ?>
 <!DOCTYPE html>

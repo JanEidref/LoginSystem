@@ -13,11 +13,12 @@
     $data   = $rbac->getAccess($role);
 
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }else if($data['edit_user'] == 0){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
+        header('Location: http://localhost/loginsystem/index.php');
         exit();         
 
     }
@@ -71,6 +72,7 @@
                 data    : $(this).serialize(),
                 success : function(response){
                     var jsonData = JSON.parse(response);
+                    $('#alert').show();
                     $('#alert').html(jsonData.Result);
                     $('#alert').attr("class", jsonData.Status);
                     $("#editUserForm").load(location.href+" #editUserForm>*","");
@@ -78,7 +80,15 @@
             });
         });
 
+        $(document).on("click", ".close", function(){
+
+            $('#alert').hide();
+
+        }); 
+
     });
+
+
     
 </script>
 </html>

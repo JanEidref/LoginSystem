@@ -1,25 +1,24 @@
 <?php
     session_start();
+    include 'modules/database/database.php';
     include 'modules/user/class.user.php';
     include 'modules/rbac/class.rbac.php';
 
-    $uid = $_SESSION['uid'];
+    $rbac   = new Rbac();
+    $uid    = $_SESSION['uid'];
+    $name   = $_SESSION['name'];
+    $role   = $_SESSION['role'];
+    $data   = $rbac->getAccess($role);
 
-    $user = new User($uid);
-    $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
-    
     if(!$uid){
-        header('Location: http://localhost/loginsystem/index.php');
-        exit();          
-    }else if($role > 1){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
-        exit();               
-    }else{
-        $name = $user->getUsersName();
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();  
+    }else if($data['add_role'] == 0){
+        $_SESSION['access'] = 2;
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();
     }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,118 +34,9 @@
     <title>Add Role</title>
 </head>
 <body>
-    <nav class="navbar navbar-expand-sm bg-secondary navbar-dark sticky-top">
-        <?php
-            echo '<a class="navbar-brand" href="profilePage.php">Hello, '.$name.'!</a>'; 
-
-            switch($role){
-
-                case 1:
-                    echo '<ul class="navbar-nav text-uppercase">';
-                    echo '  <li class="nav-item">';
-                    echo '      <a class="nav-link" href="main.php">Home</a>';
-                    echo '   </li>';
-                    echo '  <li class="nav-item dropdown">';
-                    echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          User Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item" href="addPage.php">Add User</a>';
-                    echo '      <a class="dropdown-item" href="editPage.php">Edit User</a>';
-                    echo '      <a class="dropdown-item" href="deletePage.php">Delete User</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '  <li class="nav-item dropdown active">';
-                    echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          Rbac Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item" href="roles.php">View Role</a>';
-                    echo '      <a class="dropdown-item active" href="#" active>Add Role</a>';
-                    echo '      <a class="dropdown-item" href="editRolePage.php">Edit Role</a>';
-                    echo '      <a class="dropdown-item" href="deleteRolePage.php">Delete Role</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '</ul>';
-                    echo '<ul class="navbar-nav ml-auto">';
-                    echo '    <li class="nav-item active">';
-                    echo '        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>';
-                    echo '    </li>';
-                    echo '</ul>';
-                    break;
-
-                case 2:
-                    echo '<ul class="navbar-nav text-uppercase">';
-                    echo '  <li class="nav-item">';
-                    echo '      <a class="nav-link" href="main.php">Home</a>';
-                    echo '   </li>';
-                    echo '  <li class="nav-item dropdown active">';
-                    echo '      <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          User Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item active" href="#">Add User</a>';
-                    echo '      <a class="dropdown-item disabled" href="#">Edit User</a>';
-                    echo '      <a class="dropdown-item disabled" href="#">Delete User</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '  <li class="nav-item dropdown">';
-                    echo '      <a class="nav-link dropdown-toggle disabled" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          Rbac Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item" href="#">View Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Add Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Edit Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Delete Role</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '</ul>';
-                    echo '<ul class="navbar-nav ml-auto">';
-                    echo '    <li class="nav-item active">';
-                    echo '        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>';
-                    echo '    </li>';
-                    echo '</ul>';
-                    break;
-
-                default:
-                    echo '<ul class="navbar-nav text-uppercase">';
-                    echo '  <li class="nav-item">';
-                    echo '      <a class="nav-link" href="main.php">Home</a>';
-                    echo '   </li>';
-                    echo '  <li class="nav-item dropdown active">';
-                    echo '      <a class="nav-link dropdown-toggle disabled" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          User Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item active" href="#">Add User</a>';
-                    echo '      <a class="dropdown-item" href="#">Edit User</a>';
-                    echo '      <a class="dropdown-item" href="deletePage.php">Delete User</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '  <li class="nav-item dropdown">';
-                    echo '      <a class="nav-link dropdown-toggle disabled" href="#" id="navbardrop" data-toggle="dropdown">';
-                    echo '          Rbac Menu';
-                    echo '      </a>';
-                    echo '  <div class="dropdown-menu">';
-                    echo '      <a class="dropdown-item" href="#">View Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Add Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Edit Role</a>';
-                    echo '      <a class="dropdown-item" href="#">Delete Role</a>';
-                    echo '  </div>';
-                    echo '  </li>';
-                    echo '</ul>';
-                    echo '<ul class="navbar-nav ml-auto">';
-                    echo '    <li class="nav-item active">';
-                    echo '        <a href="modules/login/logout.php" class="btn btn-dark">Logout</a>';
-                    echo '    </li>';
-                    echo '</ul>';
-                    break;
-
-            }
-        ?> 
-    </nav>
-    
+    <?php
+        include 'modules/includes/navbar.php';
+    ?>    
     <div class="container mt-3 border shadow">
         <h2 class="text-center text-secondary mt-2">Add Role</h2>
         <div class="row">
@@ -183,6 +73,9 @@
 
     $(document).ready(function(){
 
+        $('#rbac').attr("class", "nav-item dropdown active");
+        $('#addRole').attr("class", "dropdown-item active");
+
         //add role
         $('#addRoleForm').submit(function(e){
             e.preventDefault();
@@ -192,12 +85,19 @@
                 data    : $(this).serialize(),
                 success : function(response){
                     var jsonData = JSON.parse(response);
+                    $('#alert').show();
                     $('#alert').html(jsonData.Result);
                     $('#alert').attr("class", jsonData.Status);
                     $("#addRoleForm").load(location.href+" #addRoleForm>*","");
                 }
             });
         });
+
+        $(document).on("click", ".close", function(){
+
+            $('#alert').hide();
+
+        }); 
 
     });
 

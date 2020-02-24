@@ -6,19 +6,18 @@
 
     $rbac   = new Rbac();
     $uid    = $_SESSION['uid'];
-    $access = $_SESSION['access'];
     $name   = $_SESSION['name'];
     $role   = $_SESSION['role'];
     $data   = $rbac->getAccess($role);
 
     if(!$uid){
+        $_SESSION['access'] = 2;
         header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }else if($data['delete_user'] == 0){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
-        exit();         
-
+        header('Location: http://localhost/loginsystem/index.php');
+        exit();
     }
 ?>
 <!DOCTYPE html>
@@ -68,8 +67,9 @@
                     url      : 'modules/user/deleteUser.php',
                     data     : {id:$(this).val()},
                     success  : function(response){
+                        $('#status').show();
                         $('#status').html(response);
-                        $('#status').attr("class", "alert alert-success");
+                        $('#status').attr("class", "alert alert-success alert-dismissable");
                         $("#dataTable").load(location.href+" #dataTable>*","");
                     }
                 });
@@ -77,6 +77,12 @@
             return false;            
 
         });
+
+        $(document).on("click", ".close", function(){
+
+            $('#status').hide();
+
+        }); 
 
     });
 </script>
