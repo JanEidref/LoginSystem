@@ -1,17 +1,19 @@
 <?php
     session_start();
-    include 'class.rbac.php';
+    require_once '../database/database.php';
+    include '../rbac/class.rbac.php';
 
-    $uid  = $_SESSION['uid'];
-    $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
+    $uid   = $_SESSION['uid'];
+    $check = $_POST['role'];
+    $rbac  = new Rbac();
+
 
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit(); 
-    }else if($role > 1){
+    }else if(!isset($check)){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
+        header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }else{
 

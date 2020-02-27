@@ -16,6 +16,7 @@
     echo '      <tr>';
     echo '          <th class="text-center">Role Name</th>';
     echo '          <th class="text-center">Role Level</th>';
+    echo '          <th class="text-center">Action</th>';
     echo '      </tr>';
     echo '  </thead>';
     echo '  <tbody>';
@@ -28,7 +29,8 @@
 
         echo '  <tr>';
         echo '      <td class="text-center">'.$data['role_name'].'</td>';
-        echo '      <td class="text-center">'.$data['role_level'].'</>';
+        echo '      <td class="text-center">'.$data['role_level'].'</td>';
+        echo '      <td class="text-center"><button class="delete btn btn-danger" value="'.$data['role_level'].'">Delete</button></td>';
         echo '  </tr>';
 
     }

@@ -1,17 +1,18 @@
 <?php
     session_start();
-    include 'class.rbac.php';
+    require_once '../database/database.php';
+    include '../rbac/class.rbac.php';
 
-    $uid  = $_SESSION['uid'];
-    $rbac = new Rbac($uid);
-    $role = $rbac->getUserRoleNumber();
+    $uid   = $_SESSION['uid'];
+    $check = $_POST['roleId'];
+    $rbac  = new Rbac();
 
     if(!$uid){
         header('Location: http://localhost/loginsystem/index.php');
         exit(); 
-    }else if($role > 1){
+    }else if(!isset($check)){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
+        header('Location: http://localhost/loginsystem/index.php');
         exit();  
     }else{
 
@@ -26,7 +27,8 @@
             $rbac     ->checkEditRoleName($id, $roleName);
             $rbac     ->checkEditRoleLevel($id, $roleLevel);
             $rbac     ->editRole($id, $roleName, $roleLevel);        
-            $response = array('Result' => "<strong>Success:</strong> Successfully Edited Role!", 
+            $response = array('Result' => '<button type="button" class="close">&times;</button>
+                                           <strong>Success:</strong> Successfully Edited Role!', 
                               'Status' => "alert alert-success alert-dismissable");
             echo json_encode($response);
         }catch (Exception $e){

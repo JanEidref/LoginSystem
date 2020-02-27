@@ -4,7 +4,6 @@
     include '../rbac/class.rbac.php';
 
     $uid   = $_SESSION['uid'];
-    $role  = $_SESSION['uid'];
     $check = $_POST['roleName'];
     $rbac  = new Rbac();
 

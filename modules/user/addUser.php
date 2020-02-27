@@ -6,7 +6,6 @@
     include 'class.user.php';
 
     $uid   = $_SESSION['uid'];
-    $role  = $_SESSION['uid'];
     $check = $_POST['userName'];
     $user  = new User();
     $rbac  = new Rbac();
@@ -17,7 +16,7 @@
         exit();          
     }else if(!isset($check)){
         $_SESSION['access'] = 2;
-        header('Location: http://localhost/loginsystem/main.php');
+        header('Location: http://localhost/loginsystem/index.php');
         exit();               
     }else{
 

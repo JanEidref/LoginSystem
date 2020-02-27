@@ -6,7 +6,6 @@
     include 'class.user.php';
 
     $uid   = $_SESSION['uid'];
-    $role  = $_SESSION['uid'];
     $check = $_POST['uid'];
     $user  = new User();
     $rbac  = new Rbac();

@@ -21,10 +21,8 @@
         //get data of a certain role
         function getRoleData($roleId){
 
-            $query = $this->connection->prepare("SELECT * FROM roles WHERE id=?");
-            $query -> bind_param("i", $roleId);
-            $query ->execute();
-            return $query->get_result()->fetch_all(MYSQLI_ASSOC);
+            $this->connection->where("id", $roleId);
+            return $this->connection->getOne("roles");
 
         }
 
@@ -59,12 +57,11 @@
         //validate edit role name
         function checkEditRoleName($id, $roleName){
 
-            $query = $this->connection->prepare("SELECT * FROM roles WHERE role_name=? and id!=?");
-            $query ->bind_param("si", $roleName, $id); 
-            $query ->execute();
-            $row   = $query->get_result();
+           $this->connection->where("role_name", $roleName);
+           $this->connection->where("id != " .$id);
+           $data = $this->connection->getOne("roles");
 
-            if($row->num_rows > 0){
+            if(!is_null($data)){
                 throw new Exception('<button type="button" class="close">&times;</button>
                                      <strong>Error:</strong> Role Name Already Exist!');
             }
@@ -87,12 +84,11 @@
         //validate edit role level
         function checkEditRoleLevel($id, $roleLevel){
 
-            $query = $this->connection->prepare("SELECT * FROM roles WHERE role_level=? and id!=?");
-            $query ->bind_param("ii", $roleLevel, $id); 
-            $query ->execute();
-            $row   = $query->get_result();
+            $this->connection->where("role_level", $roleLevel);
+            $this->connection->where("id != " .$id);
+            $data = $this->connection->getOne("roles");
 
-            if($row->num_rows > 0){
+            if(!is_null($data)){
                 throw new Exception('<button type="button" class="close">&times;</button>
                                      <strong>Error:</strong> Role Level Already Exist!');
             }
@@ -112,12 +108,10 @@
         //check if role is assigned to users
         function checkIfUsed($roleLevel){
 
-            $query = $this->connection->prepare("SELECT * FROM rbac where role=?");
-            $query ->bind_param("i", $roleLevel);
-            $query ->execute();
-            $row   = $query->get_result();
+            $this ->connection->where("role", $roleLevel);
+            $data = $this->connection->getOne("rbac");
             
-            if($row->num_rows > 0){
+            if(!is_null($data)){
 
                 throw new Exception('<button type="button" class="close">&times;</button>
                                      <strong>Error:</strong> Certain user still assign to this Role!');
@@ -147,18 +141,18 @@
         //edit a role
         function editRole($id, $roleName, $roleLevel){
 
-            $query = $this->connection->prepare("UPDATE roles SET role_name=?, role_level=? WHERE id=?");
-            $query ->bind_param("sii", $roleName, $roleLevel, $id);
-            $query ->execute();
+            $data = array("role_name" => $roleName, "role_level" => $roleLevel);
 
+            $this->connection->where("id", $id);
+            $this->connection->update("roles", $data);
+            
         }
 
         //delete a role
         function deleteRole($roleLevel){
 
-            $query = $this->connection->prepare("DELETE FROM roles WHERE role_level=?");
-            $query ->bind_param("i", $roleLevel);
-            $query -> execute();
+            $this->connection->where("role_level", $roleLevel);
+            $this->connection->delete("roles");
 
         }
 

@@ -6,7 +6,7 @@
 
         session_start();
         $_SESSION['access'] = 2;
-        header('Location: ../../main.php');
+        header('Location: ../../index.php');
         exit();
 
     }
